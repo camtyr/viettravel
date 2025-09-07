@@ -3,8 +3,60 @@
   "WorkspaceRootPath": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\interfaces\\itokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\interfaces\\itokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\middleware\\exceptionmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\middleware\\exceptionmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\entities\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\entities\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\dtos\\userresisterdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\dtos\\userresisterdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\dtos\\userlogindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\dtos\\userlogindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\controller\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\controller\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\extensions\\\uFEFFidentityserviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\extensions\\\uFEFFidentityserviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\extensions\\applicationserviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\extensions\\applicationserviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|c:\\users\\hoiph\\onedrive\\t\u00E0i li\u1EC7u\\github\\viettravel\\api\\api\\data\\datacontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA2FD141-D053-4656-9A24-43675D6C362C}|API\\API.csproj|solutionrelative:api\\data\\datacontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\Properties\\launchSettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
@@ -18,11 +70,181 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AppUser.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Entities\\AppUser.cs",
+              "RelativeDocumentMoniker": "API\\Entities\\AppUser.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Entities\\AppUser.cs",
+              "RelativeToolTip": "API\\Entities\\AppUser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T13:27:15.684Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "UserDto.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\DTOs\\UserDto.cs",
+              "RelativeDocumentMoniker": "API\\DTOs\\UserDto.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\DTOs\\UserDto.cs",
+              "RelativeToolTip": "API\\DTOs\\UserDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAsAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T13:39:54.334Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "UserResisterDto.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\DTOs\\UserResisterDto.cs",
+              "RelativeDocumentMoniker": "API\\DTOs\\UserResisterDto.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\DTOs\\UserResisterDto.cs",
+              "RelativeToolTip": "API\\DTOs\\UserResisterDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T13:41:20.106Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Tokenservice.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Services\\Tokenservice.cs",
+              "RelativeDocumentMoniker": "API\\Services\\Tokenservice.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Services\\Tokenservice.cs",
+              "RelativeToolTip": "API\\Services\\Tokenservice.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAAwAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T13:36:38.523Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ApplicationServiceExtensions.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Extensions\\ApplicationServiceExtensions.cs",
+              "RelativeDocumentMoniker": "API\\Extensions\\ApplicationServiceExtensions.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Extensions\\ApplicationServiceExtensions.cs",
+              "RelativeToolTip": "API\\Extensions\\ApplicationServiceExtensions.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T14:02:33.868Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Controller\\AccountController.cs",
+              "RelativeDocumentMoniker": "API\\Controller\\AccountController.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Controller\\AccountController.cs",
+              "RelativeToolTip": "API\\Controller\\AccountController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T13:44:48.134Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "UserLoginDto.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\DTOs\\UserLoginDto.cs",
+              "RelativeDocumentMoniker": "API\\DTOs\\UserLoginDto.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\DTOs\\UserLoginDto.cs",
+              "RelativeToolTip": "API\\DTOs\\UserLoginDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T13:40:29.249Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ExceptionMiddleware.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Middleware\\ExceptionMiddleware.cs",
+              "RelativeDocumentMoniker": "API\\Middleware\\ExceptionMiddleware.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Middleware\\ExceptionMiddleware.cs",
+              "RelativeToolTip": "API\\Middleware\\ExceptionMiddleware.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAxwCoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T13:33:04.775Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ITokenService.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Interfaces\\ITokenService.cs",
+              "RelativeDocumentMoniker": "API\\Interfaces\\ITokenService.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Interfaces\\ITokenService.cs",
+              "RelativeToolTip": "API\\Interfaces\\ITokenService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T13:35:02.038Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\appsettings.json",
+              "RelativeDocumentMoniker": "API\\appsettings.json",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\appsettings.json",
+              "RelativeToolTip": "API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-09-07T14:37:53.529Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Program.cs",
+              "RelativeDocumentMoniker": "API\\Program.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Program.cs",
+              "RelativeToolTip": "API\\Program.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAADgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-28T14:05:15.622Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "\uFEFFIdentityServiceExtensions.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Extensions\\\uFEFFIdentityServiceExtensions.cs",
+              "RelativeDocumentMoniker": "API\\Extensions\\\uFEFFIdentityServiceExtensions.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Extensions\\\uFEFFIdentityServiceExtensions.cs",
+              "RelativeToolTip": "API\\Extensions\\\uFEFFIdentityServiceExtensions.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T14:04:11.901Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "API\\appsettings.Development.json",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\appsettings.Development.json",
+              "RelativeToolTip": "API\\appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-09-07T13:27:09.955Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "DataContext.cs",
+              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Data\\DataContext.cs",
+              "RelativeDocumentMoniker": "API\\Data\\DataContext.cs",
+              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Data\\DataContext.cs",
+              "RelativeToolTip": "API\\Data\\DataContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-07T13:27:24.708Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
               "Title": "launchSettings.json",
               "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "Properties\\launchSettings.json",
@@ -30,21 +252,7 @@
               "RelativeToolTip": "Properties\\launchSettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-08-28T14:12:33.562Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Program.cs",
-              "RelativeDocumentMoniker": "API\\Program.cs",
-              "ToolTip": "C:\\Users\\hoiph\\OneDrive\\T\u00E0i li\u1EC7u\\GitHub\\viettravel\\API\\API\\Program.cs",
-              "RelativeToolTip": "API\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACwAAAAKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-28T14:05:15.622Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-28T14:12:33.562Z"
             }
           ]
         }

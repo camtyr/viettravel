@@ -1,42 +1,69 @@
 ﻿using API.Data;
+using API.Extensions;
+using API.Interfaces;
+using API.Middleware;
+using API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Diagnostics; // Add this using directive
- 
+using System.Diagnostics;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Add sql services
-builder.Services.AddDbContext<DataContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);
-            });
+// Add services to the container
+builder.Services.AddControllers();
 
-// Add services to the container.
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(c =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+
+    // Add JWT Authentication to Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Title = "My API",
-        Version = "v1"
+        Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
     });
 });
 
 var app = builder.Build();
 
-// Enable middleware to serve generated Swagger as a JSON endpoint.
+// Middleware xử lý lỗi
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseSwagger();
-// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     options.RoutePrefix = string.Empty; // Set Swagger UI at app's root
 });
-
-// Open Swagger UI in default browser when app starts
 var url = app.Urls.FirstOrDefault() ?? "http://localhost:5000";
 app.Lifetime.ApplicationStarted.Register(() =>
 {
@@ -50,5 +77,13 @@ app.Lifetime.ApplicationStarted.Register(() =>
     }
     catch { }
 });
+
+app.UseCors("AllowReact");
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
 
 app.Run();
