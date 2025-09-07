@@ -1,9 +1,18 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using API.Data;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics; // Add this using directive
-
+ 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+// Add sql services
+builder.Services.AddDbContext<DataContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]);
+            });
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
