@@ -8,8 +8,8 @@ namespace API.DTOs
 {
     public class UserRegisterDto
     {
-        public string UserName { get; set; } // Added Name
-        public string Email { get; set; } // Changed from Username to Email
-        public string Password { get; set; }
+        public string UserName { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string Password { get; set; } = null!;
     }
 }   

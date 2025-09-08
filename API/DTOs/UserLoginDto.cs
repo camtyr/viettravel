@@ -8,8 +8,8 @@ namespace API.DTOs
 {
     public class UserLoginDto
     {
-        public string Email { get; set; } // Changed from Username to Email
-        public string Password { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 
 }

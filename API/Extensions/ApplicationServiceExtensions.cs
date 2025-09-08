@@ -12,9 +12,9 @@ public static class ApplicationServiceExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
-        services.AddDbContext<DataContext>(opt =>
+        services.AddDbContext<DataContext>(options =>
         {
-            opt.UseSqlServer(config["ConnectionStrings:DefaultConnection"]); // Corrected access to configuration value
+            options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
         });
 
         services.AddScoped<ITokenService, TokenService>();
