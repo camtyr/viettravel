@@ -15,6 +15,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 // Add services to the container
 builder.Services.AddControllers();
 
@@ -77,6 +80,15 @@ app.Lifetime.ApplicationStarted.Register(() =>
     }
     catch { }
 });
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+    await Seed.SeedAdmin(context);
+}
+
+app.UseMiddleware<AdminActionLoggingMiddleware>();
+
 
 app.UseCors("AllowReact");
 
