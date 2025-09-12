@@ -14,5 +14,7 @@ namespace API.Data
         public DbSet<Destination> Destinations { get; set; }
 
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<ReviewComment> ReviewComments { get; set; }
     }
 }
