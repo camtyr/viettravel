@@ -111,6 +111,7 @@ namespace API.Controllers
                 .Where(d => d.CreatedById == userId && d.Status == "pending")
                 .ToListAsync();
         }
+        
 
         // User lấy địa điểm bị từ chối
         [Authorize]
@@ -181,45 +182,6 @@ namespace API.Controllers
         }
 
         // ===== ADMIN =====
-
-        // Admin duyệt địa điểm
-        [Authorize(Roles = "Admin")]
-        [HttpPut("{id}/approve")]
-        public async Task<ActionResult> ApproveDestination(int id)
-        {
-            var destination = await _context.Destinations.FindAsync(id);
-            if (destination == null) return NotFound();
-
-            destination.Status = "approved";
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // Admin từ chối địa điểm
-        [Authorize(Roles = "Admin")]
-        [HttpPut("{id}/reject")]
-        public async Task<ActionResult> RejectDestination(int id)
-        {
-            var destination = await _context.Destinations.FindAsync(id);
-            if (destination == null) return NotFound();
-
-            destination.Status = "rejected";
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // Admin xem danh sách chờ duyệt
-        [Authorize(Roles = "Admin")]
-        [HttpGet("pending")]
-        public async Task<ActionResult<IEnumerable<Destination>>> GetPendingDestinations()
-        {
-            return await _context.Destinations
-                .Where(d => d.Status == "pending")
-                .ToListAsync();
-        }
-        
 
         
         // Tìm kiếm địa điểm đã duyệt theo từ khóa
