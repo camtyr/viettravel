@@ -18,6 +18,7 @@ public static class ApplicationServiceExtensions
         });
 
         services.AddScoped<ITokenService, TokenService>();
+        services.AddHttpClient<IGeminiService, GeminiService>();
 
         services.AddCors(opt =>
         {
