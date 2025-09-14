@@ -43,7 +43,7 @@ namespace API.Controllers
                 Category = dto.Category,
                 UrlPicture = dto.UrlPicture,
                 Description = dto.Description,
-                Status = "pending",                 // mặc định chờ duyệt
+                Status = "Pending",                 // mặc định chờ duyệt
                 CreatedById = int.Parse(userId),
                 CreatedDate = GetVietnamDate(),
                 Rating = 0,

@@ -6,7 +6,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin")] //  chỉ admin mới truy cập
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;
@@ -22,11 +22,32 @@ namespace API.Controllers
             var stats = await _adminService.GetDashboardStats();
             return Ok(stats);
         }
+        [HttpGet("destinations/all")]
+        public async Task<IActionResult> GetAllDestinations()
+        {
+            var destinations = await _adminService.GetAllDestinations();
+            return Ok(destinations);
+        }
+
 
         [HttpGet("destinations/pending")]
         public async Task<IActionResult> GetPendingDestinations()
         {
             var destinations = await _adminService.GetPendingDestinations();
+            return Ok(destinations);
+        }
+
+        [HttpGet("destinations/approved")]
+        public async Task<IActionResult> GetApprovedDestinations()
+        {
+            var destinations = await _adminService.GetApprovedDestinations();
+            return Ok(destinations);
+        }
+
+        [HttpGet("destinations/rejected")]
+        public async Task<IActionResult> GetRejectedDestinations()
+        {
+            var destinations = await _adminService.GetRejectedDestinations();
             return Ok(destinations);
         }
 

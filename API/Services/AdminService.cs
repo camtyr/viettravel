@@ -37,6 +37,20 @@ namespace API.Services
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Destination>> GetApprovedDestinations()
+        {
+            return await _context.Destinations
+                .Where(d => d.Status == "Approved")
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Destination>> GetRejectedDestinations()
+        {
+            return await _context.Destinations
+                .Where(d => d.Status == "Rejected")
+                .ToListAsync();
+        }
+
         public async Task ApproveDestination(int id)
         {
             var destination = await _context.Destinations.FindAsync(id);
@@ -63,5 +77,10 @@ namespace API.Services
             _context.Destinations.Remove(destination);
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<Destination>> GetAllDestinations()
+        {
+            return await _context.Destinations.ToListAsync();
+        }
+
     }
 }
