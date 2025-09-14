@@ -49,8 +49,11 @@ public class AccountController : ControllerBase
 
         return new UserDto
         {
+            Id = user.Id,
             Username = user.UserName,
-            Token = _tokenService.CreateToken(user)
+            Token = _tokenService.CreateToken(user),
+            Email = user.Email,
+            Role = user.Roles
         };
     }
 
@@ -73,8 +76,11 @@ public class AccountController : ControllerBase
 
         return new UserDto
         {
+            Id = user.Id,
             Username = user.UserName,
-            Token = _tokenService.CreateToken(user)
+            Token = _tokenService.CreateToken(user),
+            Email = user.Email,
+            Role = user.Roles
         };
     }
 
@@ -94,8 +100,11 @@ public class AccountController : ControllerBase
 
         return new UserDto
         {
+            Id = user.Id,
             Username = user.UserName,
-            Token = _tokenService.CreateToken(user)
+            Token = _tokenService.CreateToken(user),
+            Email = user.Email,
+            Role = user.Roles
         };
     }
 
