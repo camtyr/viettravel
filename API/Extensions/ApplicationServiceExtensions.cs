@@ -14,7 +14,8 @@ public static class ApplicationServiceExtensions
     {
         services.AddDbContext<DataContext>(options =>
         {
-            options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
+            var connectionString = config.GetConnectionString("DefaultConnection");
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
 
         services.AddScoped<ITokenService, TokenService>();
