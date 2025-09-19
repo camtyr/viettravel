@@ -11,7 +11,8 @@ public class Destination
 
     public double Rating { get; set; } = 0;
     public int RatingCount { get; set; } = 0;
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow.Date;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
 
 
     public int? CreatedById { get; set; }

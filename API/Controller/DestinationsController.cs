@@ -20,11 +20,11 @@ namespace API.Controllers
         }
 
         // Hàm lấy ngày hiện tại theo múi giờ Việt Nam
-        private DateTime GetVietnamDate()
-        {
-            var vietNamTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "SE Asia Standard Time");
-            return vietNamTime.Date;
-        }
+        private DateTime GetVietnamDateTime()
+    {
+        return TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "SE Asia Standard Time");
+    }
+
 
         // ===== USER =====
 
@@ -45,7 +45,7 @@ namespace API.Controllers
                 Description = dto.Description,
                 Status = "Pending",                 // mặc định chờ duyệt
                 CreatedById = int.Parse(userId),
-                CreatedDate = GetVietnamDate(),
+               CreatedDate = GetVietnamDateTime(),
                 Rating = 0,
                 RatingCount = 0
             };
