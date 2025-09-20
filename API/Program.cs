@@ -3,22 +3,18 @@ using API.Extensions;
 using API.Interfaces;
 using API.Middleware;
 using API.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ====== REGISTER SERVICES ======
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>(); // Cloudinary
 
-// Add services to the container
 builder.Services.AddControllers();
 
 builder.Services.AddApplicationServices(builder.Configuration);
@@ -29,7 +25,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
 
-    // Add JWT Authentication to Swagger
+    // JWT Authentication for Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
@@ -58,15 +54,31 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Middleware xử lý lỗi
+// ====== MIDDLEWARE ======
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<AdminActionLoggingMiddleware>();
 
+app.UseCors("AllowReact");
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// ====== SWAGGER ======
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    options.RoutePrefix = string.Empty; // Set Swagger UI at app's root
+    options.RoutePrefix = string.Empty; // Swagger UI at root
 });
+
+// ====== SEED ADMIN ======
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+    await Seed.SeedAdmin(context);
+}
+
+// ====== AUTO OPEN BROWSER ======
 var url = app.Urls.FirstOrDefault() ?? "http://localhost:5000";
 app.Lifetime.ApplicationStarted.Register(() =>
 {
@@ -81,21 +93,7 @@ app.Lifetime.ApplicationStarted.Register(() =>
     catch { }
 });
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-    await Seed.SeedAdmin(context);
-}
-
-app.UseMiddleware<AdminActionLoggingMiddleware>();
-
-
-app.UseCors("AllowReact");
-
-app.UseAuthentication();
-app.UseAuthorization();
-
+// ====== MAP CONTROLLERS ======
 app.MapControllers();
-
 
 app.Run();

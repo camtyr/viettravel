@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useData } from '../../contexts/DataContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { 
   EyeIcon, 
   TrashIcon, 
@@ -15,12 +14,13 @@ import {
 } from '@heroicons/react/24/outline';
 
 const MyDestinations: React.FC = () => {
-  const { myOwnDestinations, deleteDestination } = useData();
-  const { id } = useAuth();
+  const { myOwnDestinations, deleteMyDestination } = useData();
   const [filter, setFilter] = useState<'all' | 'Approved' | 'Pending' | 'Rejected'>('all');
 
-  const myDestinations = myOwnDestinations.filter(dest => dest.createdById === id);
-  
+  // Không cần filter createdById nữa vì API đã trả đúng địa điểm của user
+  const myDestinations = myOwnDestinations;
+
+  // Lọc theo trạng thái
   const filteredDestinations = myDestinations.filter(dest => {
     if (filter === 'all') return true;
     return dest.status === filter;
@@ -35,46 +35,34 @@ const MyDestinations: React.FC = () => {
 
   const handleDelete = (id: number, name: string) => {
     if (window.confirm(`Bạn có chắc chắn muốn xóa địa điểm "${name}"?`)) {
-      deleteDestination(id);
+      deleteMyDestination(id);
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Approved':
-        return 'text-green-600 bg-green-100';
-      case 'Pending':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'Rejected':
-        return 'text-red-600 bg-red-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
+      case 'Approved': return 'text-green-600 bg-green-100';
+      case 'Pending': return 'text-yellow-600 bg-yellow-100';
+      case 'Rejected': return 'text-red-600 bg-red-100';
+      default: return 'text-gray-600 bg-gray-100';
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'Approved':
-        return 'Đã duyệt';
-      case 'Pending':
-        return 'Chờ duyệt';
-      case 'Rejected':
-        return 'Bị từ chối';
-      default:
-        return 'Không xác định';
+      case 'Approved': return 'Đã duyệt';
+      case 'Pending': return 'Chờ duyệt';
+      case 'Rejected': return 'Bị từ chối';
+      default: return 'Không xác định';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Approved':
-        return <CheckBadgeIcon className="h-4 w-4" />;
-      case 'Pending':
-        return <ClockIcon className="h-4 w-4" />;
-      case 'rejected':
-        return <XCircleIcon className="h-4 w-4" />;
-      default:
-        return null;
+      case 'Approved': return <CheckBadgeIcon className="h-4 w-4" />;
+      case 'Pending': return <ClockIcon className="h-4 w-4" />;
+      case 'Rejected': return <XCircleIcon className="h-4 w-4" />;
+      default: return null;
     }
   };
 
@@ -84,6 +72,12 @@ const MyDestinations: React.FC = () => {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  const getImage = (dest: typeof myDestinations[0]) => {
+    return dest.urlPicture && dest.urlPicture.length > 0
+      ? dest.urlPicture[0]
+      : 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800';
   };
 
   return (
@@ -104,7 +98,7 @@ const MyDestinations: React.FC = () => {
           </Link>
         </div>
 
-        {/* Status Filter Tabs */}
+        {/* Status Tabs */}
         <div className="bg-white rounded-lg shadow-sm mb-8">
           <div className="flex flex-wrap border-b border-gray-200">
             {[
@@ -112,7 +106,7 @@ const MyDestinations: React.FC = () => {
               { key: 'Approved', label: 'Đã duyệt', count: statusCounts.approved },
               { key: 'Pending', label: 'Chờ duyệt', count: statusCounts.pending },
               { key: 'Rejected', label: 'Bị từ chối', count: statusCounts.rejected },
-            ].map((tab) => (
+            ].map(tab => (
               <button
                 key={tab.key}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -134,76 +128,63 @@ const MyDestinations: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredDestinations
               .sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime())
-              .map((destination) => (
-              <div key={destination.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                {/* Image */}
-                <div className="relative h-48">
-                  <img
-                    src={destination.urlPicture}
-                    alt={destination.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800';
-                    }}
-                  />
-                  <div className="absolute top-4 right-4">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(destination.status)}`}>
-                      {getStatusIcon(destination.status)}
-                      <span className="ml-1">{getStatusText(destination.status)}</span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {destination.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {destination.description}
-                  </p>
-                  
-                  <div className="flex items-center text-sm text-gray-500 mb-3">
-                    <MapPinIcon className="h-4 w-4 mr-1" />
-                    <span className="truncate">{destination.location}</span>
+              .map(destination => (
+                <div key={destination.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="relative h-48">
+                    <img
+                      src={getImage(destination)}
+                      alt={destination.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-4 right-4">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(destination.status)}`}>
+                        {getStatusIcon(destination.status)}
+                        <span className="ml-1">{getStatusText(destination.status)}</span>
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center">
-                        <StarIcon className="h-4 w-4 mr-1 text-yellow-500" />
-                        <span>{destination.rating > 0 ? destination.rating.toFixed(1) : 'N/A'}</span>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{destination.name}</h3>
+                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">{destination.description}</p>
+                    <div className="flex items-center text-sm text-gray-500 mb-3">
+                      <MapPinIcon className="h-4 w-4 mr-1" />
+                      <span className="truncate">{destination.location}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex items-center">
+                          <StarIcon className="h-4 w-4 mr-1 text-yellow-500" />
+                          <span>{destination.rating > 0 ? destination.rating.toFixed(1) : 'N/A'}</span>
+                        </div>
+                        <span>{destination.ratingCount} đánh giá</span>
                       </div>
-                      <span>{destination.ratingCount} đánh giá</span>
+                      <div className="flex items-center">
+                        <CalendarIcon className="h-4 w-4 mr-1" />
+                        <span>{formatDate(destination.createdDate)}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center">
-                      <CalendarIcon className="h-4 w-4 mr-1" />
-                      <span>{formatDate(destination.createdDate)}</span>
-                    </div>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                    <Link
-                      to={`/destinations/${destination.id}`}
-                      className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 transition-colors"
-                    >
-                      <EyeIcon className="h-4 w-4" />
-                      <span className="text-sm font-medium">Xem chi tiết</span>
-                    </Link>
-                    
-                    <button
-                      onClick={() => handleDelete(destination.id, destination.name)}
-                      className="flex items-center space-x-1 text-red-600 hover:text-red-700 transition-colors"
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                      <span className="text-sm font-medium">Xóa</span>
-                    </button>
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                      <Link
+                        to={`/destinations/${destination.id}`}
+                        className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 transition-colors"
+                      >
+                        <EyeIcon className="h-4 w-4" />
+                        <span className="text-sm font-medium">Xem chi tiết</span>
+                      </Link>
+
+                      <button
+                        onClick={() => handleDelete(destination.id, destination.name)}
+                        className="flex items-center space-x-1 text-red-600 hover:text-red-700 transition-colors"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                        <span className="text-sm font-medium">Xóa</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         ) : (
           <div className="text-center py-16">
@@ -239,21 +220,15 @@ const MyDestinations: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div className="flex items-center space-x-2">
                 <CheckBadgeIcon className="h-5 w-5 text-green-600" />
-                <span className="text-gray-700">
-                  <strong>Đã duyệt:</strong> Hiển thị công khai, có thể nhận đánh giá
-                </span>
+                <span className="text-gray-700"><strong>Đã duyệt:</strong> Hiển thị công khai, có thể nhận đánh giá</span>
               </div>
               <div className="flex items-center space-x-2">
                 <ClockIcon className="h-5 w-5 text-yellow-600" />
-                <span className="text-gray-700">
-                  <strong>Chờ duyệt:</strong> Đang được admin xem xét
-                </span>
+                <span className="text-gray-700"><strong>Chờ duyệt:</strong> Đang được admin xem xét</span>
               </div>
               <div className="flex items-center space-x-2">
                 <XCircleIcon className="h-5 w-5 text-red-600" />
-                <span className="text-gray-700">
-                  <strong>Bị từ chối:</strong> Không hiển thị công khai
-                </span>
+                <span className="text-gray-700"><strong>Bị từ chối:</strong> Không hiển thị công khai</span>
               </div>
             </div>
           </div>

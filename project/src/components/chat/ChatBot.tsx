@@ -52,23 +52,32 @@ const ChatBot: React.FC = () => {
     setIsTyping(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/Chat/chat', inputText, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      // Gọi API Chat
+      const token = localStorage.getItem('token'); // Hoặc từ context
+      const response = await axios.post(
+        'http://localhost:5000/api/Chat/chat',
+        inputText,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: response.data.response || 'Xin lỗi, tôi chưa hiểu câu hỏi của bạn.',
+        text: response.data.response,
         isBot: true,
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, botMessage]);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      console.error('Error sending message:', error);
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
-        text: 'Có lỗi xảy ra khi kết nối tới server. Vui lòng thử lại.',
+        text: 'Xin lỗi, hiện tại không thể kết nối tới server.',
         isBot: true,
         timestamp: new Date(),
       };

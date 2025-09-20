@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useData, Destination } from '../../contexts/DataContext';
+import { Destination, useData } from '../../contexts/DataContext';
 import { 
   MagnifyingGlassIcon, 
   MapPinIcon, 
@@ -87,9 +87,10 @@ const Destinations: React.FC = () => {
           </p>
         </div>
 
-        {/* Search & Filters */}
+        {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search */}
             <div className="flex-1 relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
@@ -101,7 +102,7 @@ const Destinations: React.FC = () => {
               />
             </div>
 
-            {/* Filter Toggle Mobile */}
+            {/* Filter Toggle (Mobile) */}
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="lg:hidden flex items-center space-x-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
@@ -110,14 +111,18 @@ const Destinations: React.FC = () => {
               <span>Bộ lọc</span>
             </button>
 
-            {/* Desktop Filters */}
+            {/* Filters (Desktop) */}
             <div className="hidden lg:flex items-center space-x-4">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
 
               <select
@@ -152,7 +157,11 @@ const Destinations: React.FC = () => {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -192,7 +201,7 @@ const Destinations: React.FC = () => {
         {/* Destinations Grid */}
         {filteredAndSortedDestinations.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredAndSortedDestinations.map(destination => (
+            {filteredAndSortedDestinations.map((destination) => (
               <Link
                 key={destination.id}
                 to={`/destinations/${destination.id}`}
@@ -200,14 +209,20 @@ const Destinations: React.FC = () => {
               >
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={destination.urlPicture || 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800'}
+                    src={destination.urlPicture[0]}
                     alt={destination.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800';
+                    }}
                   />
                   <div className="absolute top-4 right-4">
                     <div className="bg-white bg-opacity-90 px-2 py-1 rounded-full flex items-center space-x-1">
                       <StarIcon className="h-4 w-4 text-yellow-500" />
-                      <span className="text-sm font-medium">{destination.rating > 0 ? destination.rating.toFixed(1) : 'N/A'}</span>
+                      <span className="text-sm font-medium">
+                        {destination.rating > 0 ? destination.rating.toFixed(1) : 'N/A'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -234,7 +249,17 @@ const Destinations: React.FC = () => {
           </div>
         ) : (
           <div className="text-center py-16">
-            <p className="text-gray-500 mb-6">Không tìm thấy địa điểm nào</p>
+            <MapPinIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Không tìm thấy địa điểm nào</h3>
+            <p className="text-gray-500 mb-6">
+              Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc của bạn
+            </p>
+            <Link
+              to="/create-destination"
+              className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              <span>Thêm địa điểm mới</span>
+            </Link>
           </div>
         )}
       </div>

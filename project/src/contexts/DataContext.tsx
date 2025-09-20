@@ -1,14 +1,14 @@
-// src/contexts/DataContext.tsx
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
+import api from '../BaseUrl';
 
 export interface Destination {
   id: number;
   name: string;
   location: string;
   category: string;
-  urlPicture: string;
+  urlPicture: string[];
   description: string;
   status: 'Pending' | 'Approved' | 'Rejected';
   rating: number;
@@ -29,7 +29,7 @@ export interface Review {
 }
 
 export interface ReviewComment {
-  id: number |null;
+  id: number | null;
   reviewId: number;
   userId: number;
   content: string;
@@ -43,9 +43,22 @@ interface DataContextType {
   reviews: Review[];
   comments: Record<number, ReviewComment[]>;
   fetchDestinations: () => Promise<void>;
-  fetchMyDestinations: () => Promise<void>; 
+  fetchMyDestinations: () => Promise<void>;
   searchDestinations: (keyword: string) => Promise<void>;
-  addDestination: (data: Omit<Destination, 'id' | 'createdDate' | 'rating' | 'ratingCount' | 'status'> & { status?: 'Pending' | 'Approved' }) => Promise<void>;
+  addDestination: (data: {
+    name: string;
+    location: string;
+    category: string;
+    description: string;
+    files: File[];
+  }) => Promise<void>;
+  updateMyDestination: (id: number, data: {
+    name: string;
+    location: string;
+    category: string;
+    description: string;
+    file?: File;
+  }) => Promise<void>;
   updateDestination: (id: number, action: 'Approve' | 'Reject') => Promise<void>;
   deleteDestination: (id: number) => Promise<void>;
   getDestinationReviews: (destinationId: number) => Promise<void>;
@@ -57,12 +70,13 @@ interface DataContextType {
   deleteComment: (commentId: number) => Promise<void>;
   publicDestinations: Destination[];
   fetchPublicDestinations: () => Promise<void>;
+  deleteMyDestination: (id: number) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { token, role } = useAuth(); // role: 'Admin' | 'User'
+  const { token, role } = useAuth();
   const [publicDestinations, setPublicDestinations] = useState<Destination[]>([]);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -70,26 +84,31 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [myOwnDestinations, setMyDestinations] = useState<Destination[]>([]);
 
   const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: api.defaults.baseURL,
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
-  const publicAxios = axios.create({
-    baseURL: 'http://localhost:5000/api',
-  });
 
-  // ------------------ Public Destinations (No token) ------------------
+  const publicAxios = axios.create({ baseURL: api.defaults.baseURL });
+
+  // ------------------ Public Destinations ------------------
   const fetchPublicDestinations = async () => {
     try {
       const res = await publicAxios.get<Destination[]>('/Destinations/approved');
-      setPublicDestinations(res.data);
+      // map imageUrls => urlPicture
+      const mapped = res.data.map(dest => ({
+        ...dest,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        urlPicture: (dest as any).imageUrls ?? [],
+      }));
+      setPublicDestinations(mapped);
     } catch (err) {
       console.error('Fetch public destinations failed:', err);
     }
   };
 
-  // ------------------ Destinations ------------------
+  // ------------------ Admin Destinations ------------------
   const fetchDestinations = async () => {
-     if (!token || role !== 'Admin') return;
+    if (!token || role !== 'Admin') return;
     try {
       const res = await axiosInstance.get<Destination[]>('/Admin/destinations/all');
       setDestinations(res.data);
@@ -108,19 +127,73 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const addDestination = async (data: Omit<Destination, 'id' | 'createdDate' | 'rating' | 'ratingCount' | 'status'> & { status?: 'Pending' | 'Approved' }) => {
+  // ------------------ User Destinations ------------------
+  const addDestination = async (data: {
+    name: string;
+    location: string;
+    category: string;
+    description: string;
+    files: File[];
+  }) => {
     if (!token) return;
+
+    if (!data.files || data.files.length === 0) {
+      console.error('No files provided');
+      return;
+    }
+
     try {
-      const res = await axiosInstance.post<Destination>('/Destinations', {
-        name: data.name,
-        location: data.location,
-        category: data.category,
-        urlPicture: data.urlPicture,
-        description: data.description,
+      const formData = new FormData();
+      formData.append("Name", data.name);
+      formData.append("Location", data.location);
+      formData.append("Category", data.category);
+      formData.append("Description", data.description);
+
+      data.files.forEach((file) => formData.append("Files", file));
+
+      const res = await axiosInstance.post<Destination>("/Destinations", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        }
       });
-      setDestinations(prev => [...prev, res.data]);
+
+      setMyDestinations(prev => [...prev, res.data]);
     } catch (err) {
-      console.error('Add destination failed:', err);
+      console.error("Add destination failed:", err);
+    }
+  };
+
+  const updateMyDestination = async (id: number, data: {
+    name: string;
+    location: string;
+    category: string;
+    description: string;
+    file?: File;
+  }) => {
+    if (!token) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("Name", data.name);
+      formData.append("Location", data.location);
+      formData.append("Category", data.category);
+      formData.append("Description", data.description);
+
+      if (data.file) {
+        formData.append("File", data.file);
+      }
+
+      const res = await axiosInstance.put<Destination>(`/Destinations/my/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setMyDestinations(prev => prev.map(d => (d.id === id ? res.data : d)));
+    } catch (err) {
+      console.error("Update my destination failed:", err);
     }
   };
 
@@ -147,16 +220,39 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const deleteMyDestination = async (id: number) => {
+    if (!token) return;
+    try {
+      await axiosInstance.delete(`/Destinations/my/${id}`);
+      setMyDestinations(prev => prev.filter(d => d.id !== id));
+      setReviews(prev => prev.filter(r => r.destinationId !== id));
+    } catch (err) {
+      console.error('Delete my destination failed:', err);
+    }
+  };
+
+  const fetchMyDestinations = async () => {
+    if (!token) return;
+    try {
+      const res = await axiosInstance.get<Destination[]>('/Destinations/my');
+      setMyDestinations(res.data);
+    } catch (err) {
+      console.error('Fetch my destinations failed:', err);
+    }
+  };
+
   // ------------------ Reviews ------------------
   const getDestinationReviews = async (destinationId: number) => {
     try {
-      const res = await publicAxios.get<Review[]>(`/Reviews/destination/${destinationId}`);
+      const response = await api.get(`/reviews/destination/${destinationId}`);
       setReviews(prev => {
         const filtered = prev.filter(r => r.destinationId !== destinationId);
-        return [...filtered, ...res.data];
+        return [...filtered, ...response.data];
       });
-    } catch (err) {
-      console.error('Fetch destination reviews failed:', err);
+      return response.data;
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách review:", error);
+      return [];
     }
   };
 
@@ -221,16 +317,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Delete comment failed:', err);
     }
   };
-   // ------------------ My Destinations ------------------
-  const fetchMyDestinations = async () => {
-    if (!token) return;
-    try {
-      const res = await axiosInstance.get<Destination[]>('/Destinations/my');
-      setMyDestinations(res.data);
-    } catch (err) {
-      console.error('Fetch my destinations failed:', err);
-    }
-  };
+
+  // ------------------ Effects ------------------
   useEffect(() => {
     fetchPublicDestinations();
   }, []);
@@ -238,7 +326,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     if (token) {
       fetchDestinations();
-      fetchMyDestinations(); // <-- gọi API my destinations khi có token
+      fetchMyDestinations();
     }
   }, [token]);
 
@@ -255,6 +343,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         fetchDestinations,
         searchDestinations,
         addDestination,
+        updateMyDestination,
         updateDestination,
         deleteDestination,
         getDestinationReviews,
@@ -264,6 +353,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         addComment,
         updateComment,
         deleteComment,
+        deleteMyDestination
       }}
     >
       {children}

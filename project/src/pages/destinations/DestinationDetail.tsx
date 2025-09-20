@@ -1,7 +1,6 @@
-// src/pages/DestinationDetail.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useData, Review } from '../../contexts/DataContext';
+import { useData } from '../../contexts/DataContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   MapPinIcon, 
@@ -16,23 +15,22 @@ import {
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
 const DestinationDetail: React.FC = () => {
-  const {  username } = useAuth();
   const { id } = useParams<{ id: string }>();
-  const { publicDestinations, getDestinationReviews, reviews, addReview } = useData();
-
+  const { publicDestinations, reviews, addReview, getDestinationReviews } = useData();
+  const { id: userId } = useAuth();
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [destinationReviews, setDestinationReviews] = useState<Review[]>([]);
 
-  const destination = publicDestinations.find(d => d.id === Number(id));
+  const destinationId = Number(id);
+  const destination = publicDestinations.find(d => d.id === destinationId);
 
   useEffect(() => {
-    if (id) {
-      getDestinationReviews(Number(id)).then(() => {
-        setDestinationReviews(reviews.filter(r => r.destinationId === Number(id)));
-      });
-    }
-  }, [id, reviews]);
+  if (destinationId) {
+    getDestinationReviews(destinationId);
+  }
+}, [destinationId]);
+
+  const destinationReviews = reviews.filter(r => r.destinationId === destinationId);
 
   if (!destination) {
     return (
@@ -54,7 +52,7 @@ const DestinationDetail: React.FC = () => {
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username) return;
+    if (!userId) return;
 
     setIsSubmitting(true);
     await addReview(destination.id, newReview.rating, newReview.comment.trim());
@@ -140,45 +138,109 @@ const DestinationDetail: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            {/* Hero Image */}
-            <div className="relative h-96 rounded-xl overflow-hidden mb-8">
-              <img
-                src={destination.urlPicture}
-                alt={destination.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800';
-                }}
-              />
-              <div className="absolute top-4 right-4">
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(destination.status)}`}>
-                  {destination.status === 'Approved' && <CheckBadgeIcon className="h-4 w-4 mr-1" />}
-                  {destination.status === 'Pending' && <ClockIcon className="h-4 w-4 mr-1" />}
-                  {getStatusText(destination.status)}
-                </span>
-              </div>
+            {/* Image Gallery */}
+            <div className="mb-8">
+              {destination.urlPicture && destination.urlPicture.length > 1 ? (
+                <div className="space-y-4">
+                  {/* Main Image */}
+                  <div className="relative h-96 rounded-xl overflow-hidden">
+                    <img
+                      src={destination.urlPicture[0]}
+                      alt={destination.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800';
+                      }}
+                    />
+                    <div className="absolute top-4 right-4">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(destination.status)}`}>
+                        {destination.status === 'Approved' && <CheckBadgeIcon className="h-4 w-4 mr-1" />}
+                        {destination.status === 'Pending' && <ClockIcon className="h-4 w-4 mr-1" />}
+                        {getStatusText(destination.status)}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">
+                      1 / {destination.urlPicture.length}
+                    </div>
+                  </div>
+                  
+                  {/* Thumbnail Gallery */}
+                  <div className="grid grid-cols-4 gap-3">
+                    {destination.urlPicture.slice(1, 5).map((urlPicture, index) => (
+                      <div key={index} className="relative h-24 rounded-lg overflow-hidden">
+                        <img
+                          src={urlPicture}
+                          alt={`${destination.name} ${index + 2}`}
+                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300 cursor-pointer"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=400';
+                          }}
+                        />
+                        {index === 3 && destination.urlPicture && destination.urlPicture.length > 5 && (
+                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                            <span className="text-white font-medium">+{destination.urlPicture.length - 4}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Single Image */
+                <div className="relative h-96 rounded-xl overflow-hidden">
+                  <img
+                    src={destination.urlPicture[0]}
+                    alt={destination.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800';
+                    }}
+                  />
+                  <div className="absolute top-4 right-4">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(destination.status)}`}>
+                      {destination.status === 'Approved' && <CheckBadgeIcon className="h-4 w-4 mr-1" />}
+                      {destination.status === 'Pending' && <ClockIcon className="h-4 w-4 mr-1" />}
+                      {getStatusText(destination.status)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
+
 
             {/* Destination Info */}
             <div className="bg-white rounded-xl shadow-md p-8 mb-8">
               <h1 className="text-4xl font-bold text-gray-900 mb-4">{destination.name}</h1>
+              
               <div className="flex flex-wrap items-center gap-6 mb-6">
                 <div className="flex items-center space-x-1">
                   <MapPinIcon className="h-5 w-5 text-gray-500" />
                   <span className="text-gray-700">{destination.location}</span>
                 </div>
+                
                 <div className="flex items-center space-x-1">
                   <StarIcon className="h-5 w-5 text-yellow-500" />
-                  <span className="font-medium">{destination.rating > 0 ? destination.rating.toFixed(1) : 'Chưa có đánh giá'}</span>
+                  <span className="font-medium">
+                    {destination.rating > 0 ? destination.rating.toFixed(1) : 'Chưa có đánh giá'}
+                  </span>
                   <span className="text-gray-500">({destination.ratingCount} đánh giá)</span>
                 </div>
+
                 <div className="flex items-center space-x-1">
                   <TagIcon className="h-5 w-5 text-gray-500" />
-                  <span className="text-gray-700">{categories[destination.category as keyof typeof categories] || 'Khác'}</span>
+                  <span className="text-gray-700">
+                    {categories[destination.category as keyof typeof categories] || 'Khác'}
+                  </span>
                 </div>
               </div>
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">{destination.description}</p>
+
+              <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                {destination.description}
+              </p>
+
               <div className="flex items-center text-sm text-gray-500">
                 <CalendarIcon className="h-4 w-4 mr-1" />
                 <span>Được thêm vào {formatDate(destination.createdDate)}</span>
@@ -187,31 +249,44 @@ const DestinationDetail: React.FC = () => {
 
             {/* Reviews Section */}
             <div className="bg-white rounded-xl shadow-md p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Đánh giá ({destinationReviews.length})</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                Đánh giá ({destinationReviews.length})
+              </h2>
 
               {/* Add Review Form */}
-              {username && destination.status === 'Approved' && (
+              {userId && destination.status === 'Approved' && (
                 <div className="mb-8 p-6 bg-gray-50 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Viết đánh giá của bạn</h3>
                   <form onSubmit={handleSubmitReview}>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Đánh giá</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Đánh giá
+                      </label>
                       <div className="flex items-center space-x-1">
-                        {[1,2,3,4,5].map(star => (
+                        {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
                             type="button"
                             onClick={() => setNewReview({ ...newReview, rating: star })}
                             className="text-2xl focus:outline-none"
                           >
-                            {star <= newReview.rating ? <StarSolidIcon className="h-8 w-8 text-yellow-500" /> : <StarIcon className="h-8 w-8 text-gray-300" />}
+                            {star <= newReview.rating ? (
+                              <StarSolidIcon className="h-8 w-8 text-yellow-500" />
+                            ) : (
+                              <StarIcon className="h-8 w-8 text-gray-300" />
+                            )}
                           </button>
                         ))}
-                        <span className="ml-2 text-sm text-gray-600">{newReview.rating}/5 sao</span>
+                        <span className="ml-2 text-sm text-gray-600">
+                          {newReview.rating}/5 sao
+                        </span>
                       </div>
                     </div>
+
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Bình luận</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Bình luận
+                      </label>
                       <textarea
                         value={newReview.comment}
                         onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
@@ -221,6 +296,7 @@ const DestinationDetail: React.FC = () => {
                         required
                       />
                     </div>
+
                     <button
                       type="submit"
                       disabled={isSubmitting || !newReview.comment.trim()}
@@ -242,10 +318,13 @@ const DestinationDetail: React.FC = () => {
                 </div>
               )}
 
-              {!username && destination.status === 'Approved' && (
+              {!userId && destination.status === 'Approved' && (
                 <div className="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
                   <p className="text-blue-800">
-                    <Link to="/login" className="font-medium hover:underline">Đăng nhập</Link> để viết đánh giá
+                    <Link to="/login" className="font-medium hover:underline">
+                      Đăng nhập
+                    </Link>{' '}
+                    để viết đánh giá cho địa điểm này
                   </p>
                 </div>
               )}
@@ -254,30 +333,36 @@ const DestinationDetail: React.FC = () => {
               {destinationReviews.length > 0 ? (
                 <div className="space-y-6">
                   {destinationReviews
-                    .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                    .map(review => (
-                      <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
-                        <div className="flex items-start space-x-4">
-                          <div className="bg-blue-100 p-2 rounded-full">
-                            <UserIcon className="h-6 w-6 text-blue-600" />
+                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                    .map((review) => (
+                    <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-blue-100 p-2 rounded-full">
+                          <UserIcon className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-semibold text-gray-900">{review.username}</h4>
+                            <span className="text-sm text-gray-500">
+                              {formatDate(review.createdAt)}
+                            </span>
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-semibold text-gray-900">{review.username}</h4>
-                              <span className="text-sm text-gray-500">{formatDate(review.createdAt)}</span>
-                            </div>
-                            <div className="flex items-center mb-2">
-                              {[1,2,3,4,5].map(star => (
-                                <StarSolidIcon key={star} className={`h-4 w-4 ${star <= review.rating ? 'text-yellow-500' : 'text-gray-300'}`} />
-                              ))}
-                              <span className="ml-2 text-sm text-gray-600">{review.rating}/5</span>
-                            </div>
-                            <p className="text-gray-700">{review.comment}</p>
+                          <div className="flex items-center mb-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <StarSolidIcon
+                                key={star}
+                                className={`h-4 w-4 ${
+                                  star <= review.rating ? 'text-yellow-500' : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                            <span className="ml-2 text-sm text-gray-600">{review.rating}/5</span>
                           </div>
+                          <p className="text-gray-700">{review.comment}</p>
                         </div>
                       </div>
-                    ))
-                  }
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -291,24 +376,41 @@ const DestinationDetail: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
+              {/* Quick Actions */}
               <div className="bg-white rounded-xl shadow-md p-6 mb-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Thao tác nhanh</h3>
                 <div className="space-y-3">
-                  <Link to="/destinations" className="block w-full text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Quay lại danh sách</Link>
-                  <Link to="/create-destination" className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Thêm địa điểm khác</Link>
+                  <Link
+                    to="/destinations"
+                    className="block w-full text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Quay lại danh sách
+                  </Link>
+                  <Link
+                    to="/create-destination"
+                    className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Thêm địa điểm khác
+                  </Link>
                 </div>
               </div>
+
+              {/* Related Info */}
               <div className="bg-white rounded-xl shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Thông tin thêm</h3>
                 <dl className="space-y-3">
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Danh mục</dt>
-                    <dd className="text-sm text-gray-900">{categories[destination.category as keyof typeof categories] || 'Khác'}</dd>
+                    <dd className="text-sm text-gray-900">
+                      {categories[destination.category as keyof typeof categories] || 'Khác'}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Trạng thái</dt>
                     <dd>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(destination.status)}`}>{getStatusText(destination.status)}</span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(destination.status)}`}>
+                        {getStatusText(destination.status)}
+                      </span>
                     </dd>
                   </div>
                   <div>

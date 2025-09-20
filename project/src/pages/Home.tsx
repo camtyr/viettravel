@@ -14,16 +14,23 @@ const Home: React.FC = () => {
   
   const approvedDestinations = publicDestinations
     .filter(dest => dest.status === 'Approved')
-    .sort((a, b) => b.rating - a.rating)
+    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
     .slice(0, 6);
 
+  // Stats an toàn, tránh NaN
   const stats = {
     totalDestinations: publicDestinations.filter(d => d.status === 'Approved').length,
-    totalReviews: publicDestinations.reduce((sum, d) => sum + d.ratingCount, 0),
+    totalReviews: publicDestinations.reduce((sum, d) => sum + (d.ratingCount ?? 0), 0),
     avgRating: publicDestinations.length > 0 
-      ? publicDestinations.reduce((sum, d) => sum + d.rating, 0) / publicDestinations.length 
+      ? publicDestinations.reduce((sum, d) => sum + (d.rating ?? 0), 0) / publicDestinations.length
       : 0,
   };
+
+  // Lấy ảnh đầu tiên, fallback nếu không có
+  const getDestinationImage = (dest: typeof approvedDestinations[0]) =>
+    dest.urlPicture && dest.urlPicture.length > 0
+      ? dest.urlPicture[0]
+      : 'https://via.placeholder.com/400x300?text=No+Image';
 
   return (
     <div className="min-h-screen">
@@ -38,60 +45,55 @@ const Home: React.FC = () => {
             backgroundPosition: 'center',
           }}
         ></div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <div className="text-center fade-in">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Khám phá <span className="text-yellow-400">Việt Nam</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed">
-              Tìm kiếm những địa điểm tuyệt vời nhất, chia sẻ trải nghiệm và khám phá vẻ đẹp của đất nước ta
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/destinations"
-                className="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg inline-flex items-center justify-center space-x-2"
-              >
-                <MapPinIcon className="h-5 w-5" />
-                <span>Khám phá ngay</span>
-              </Link>
-              <Link
-                to="/create-destination"
-                className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center space-x-2"
-              >
-                <TruckIcon className="h-5 w-5" />
-                <span>Chia sẻ địa điểm</span>
-              </Link>
-            </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            Khám phá <span className="text-yellow-400">Việt Nam</span>
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed">
+            Tìm kiếm những địa điểm tuyệt vời nhất, chia sẻ trải nghiệm và khám phá vẻ đẹp của đất nước ta
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/destinations"
+              className="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-lg inline-flex items-center justify-center space-x-2"
+            >
+              <MapPinIcon className="h-5 w-5" />
+              <span>Khám phá ngay</span>
+            </Link>
+            <Link
+              to="/create-destination"
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center space-x-2"
+            >
+              <TruckIcon className="h-5 w-5" />
+              <span>Chia sẻ địa điểm</span>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
       <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPinIcon className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">{stats.totalDestinations}</h3>
-              <p className="text-gray-600">Địa điểm du lịch</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div>
+            <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MapPinIcon className="h-8 w-8 text-blue-600" />
             </div>
-            <div className="text-center">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <UserGroupIcon className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">{stats.totalReviews}</h3>
-              <p className="text-gray-600">Đánh giá từ du khách</p>
+            <h3 className="text-3xl font-bold text-gray-900 mb-2">{stats.totalDestinations}</h3>
+            <p className="text-gray-600">Địa điểm du lịch</p>
+          </div>
+          <div>
+            <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <UserGroupIcon className="h-8 w-8 text-green-600" />
             </div>
-            <div className="text-center">
-              <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <StarIcon className="h-8 w-8 text-yellow-600" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">{stats.avgRating.toFixed(1)}</h3>
-              <p className="text-gray-600">Đánh giá trung bình</p>
+            <h3 className="text-3xl font-bold text-gray-900 mb-2">{stats.totalReviews}</h3>
+            <p className="text-gray-600">Đánh giá từ du khách</p>
+          </div>
+          <div>
+            <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <StarIcon className="h-8 w-8 text-yellow-600" />
             </div>
+            <h3 className="text-3xl font-bold text-gray-900 mb-2">{stats.avgRating.toFixed(1)}</h3>
+            <p className="text-gray-600">Đánh giá trung bình</p>
           </div>
         </div>
       </section>
@@ -118,7 +120,7 @@ const Home: React.FC = () => {
                 >
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={destination.urlPicture}
+                      src={getDestinationImage(destination)}
                       alt={destination.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />

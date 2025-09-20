@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const Navbar: React.FC = () => {
-  const { username, role, logout } = useAuth(); // ✅ dùng đúng context
+  const { username, role, logout } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -76,6 +76,12 @@ const Navbar: React.FC = () => {
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       Địa điểm của tôi
+                    </Link>
+                    <Link 
+                      to="/change-password" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Đổi mật khẩu
                     </Link>
                     {role === 'Admin' && (
                       <>
@@ -173,6 +179,13 @@ const Navbar: React.FC = () => {
                     onClick={closeMobileMenu}
                   >
                     Địa điểm của tôi
+                  </Link>
+                  <Link 
+                    to="/change-password" 
+                    className="text-gray-700 hover:text-blue-600 transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    Đổi mật khẩu
                   </Link>
                   {role === 'Admin' && (
                     <>

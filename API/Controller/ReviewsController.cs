@@ -28,7 +28,7 @@ namespace API.Controllers
         {
             var userId = GetUserId();
 
-            var destination = await _context.Destinations.FirstOrDefaultAsync(d => d.Id == destinationId && d.Status == "approved");
+            var destination = await _context.Destinations.FirstOrDefaultAsync(d => d.Id == destinationId && d.Status == "Approved");
             if (destination == null) return NotFound("Địa điểm không tồn tại hoặc chưa được duyệt");
 
             var existing = await _context.Reviews.FirstOrDefaultAsync(r => r.DestinationId == destinationId && r.UserId == userId);
@@ -77,7 +77,7 @@ namespace API.Controllers
         [HttpGet("destination/{destinationId}")]
         public async Task<ActionResult<IEnumerable<object>>> GetDestinationReviews(int destinationId)
         {
-            var exists = await _context.Destinations.AnyAsync(d => d.Id == destinationId && d.Status == "approved");
+            var exists = await _context.Destinations.AnyAsync(d => d.Id == destinationId && d.Status == "Approved");
             if (!exists) return NotFound();
 
             var reviews = await _context.Reviews
