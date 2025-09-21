@@ -1,8 +1,9 @@
-// src/pages/DestinationDetail.tsx  (hoặc đường dẫn file hiện tại của bạn)
+// src/pages/DestinationDetail.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useData } from '../../contexts/DataContext';
 import { useAuth } from '../../contexts/AuthContext';
+
 import { 
   MapPinIcon, 
   StarIcon, 
@@ -20,16 +21,18 @@ const placeholderThumb = 'https://images.pexels.com/photos/1450360/pexels-photo-
 
 const DestinationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { publicDestinations, reviews, addReview, getDestinationReviews } = useData();
-  const { id: userId } = useAuth();
+  const { publicDestinations, getDestinationReviews, addReview, destinationReviews} = useData();
+  const { id: userId} = useAuth();
+
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mainImage, setMainImage] = useState<string>(placeholderLarge);
 
   const destinationId = Number(id);
   const destination = publicDestinations.find(d => d.id === destinationId);
 
-  // mainImage state: ảnh chính hiển thị
-  const [mainImage, setMainImage] = useState<string>(placeholderLarge);
+  // API: lấy reviews theo destinationId
 
   useEffect(() => {
     if (destinationId) {
@@ -37,22 +40,17 @@ const DestinationDetail: React.FC = () => {
     }
   }, [destinationId]);
 
-  // khi destination thay đổi (khi data từ context load xong), set mainImage mặc định
   useEffect(() => {
     if (destination) {
-      // nếu urlPicture là mảng và có ít nhất 1 ảnh -> set ảnh đầu
       if (Array.isArray(destination.urlPicture) && destination.urlPicture.length > 0) {
         setMainImage(destination.urlPicture[0]);
       } else if (typeof destination.urlPicture === 'string' && (destination.urlPicture as string).length > 0) {
-        // phòng trường hợp urlPicture lưu chuỗi (như single url)
         setMainImage(destination.urlPicture as string);
       } else {
         setMainImage(placeholderLarge);
       }
     }
   }, [destination]);
-
-  const destinationReviews = reviews.filter(r => r.destinationId === destinationId);
 
   if (!destination) {
     return (
@@ -74,8 +72,7 @@ const DestinationDetail: React.FC = () => {
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-if (!userId) return;
-
+    if (!userId) return;
     setIsSubmitting(true);
     await addReview(destination.id, newReview.rating, newReview.comment.trim());
     setNewReview({ rating: 5, comment: '' });
@@ -124,8 +121,16 @@ if (!userId) return;
     mountain: 'Núi',
     city: 'Thành phố',
   };
+  // Tính trung bình rating từ reviews
+const avg =
+  destinationReviews.length > 0
+    ? destinationReviews.reduce((sum, review) => sum + review.rating, 0) /
+      destinationReviews.length
+    : 0;
 
-  // compute index hiển thị (1-based)
+// Ép thành string 1 chữ số thập phân
+const averageRating = avg > 0 ? avg.toFixed(1) : null;
+
   const currentIndex = Array.isArray(destination.urlPicture)
     ? Math.max(1, destination.urlPicture.findIndex(img => img === mainImage) + 1)
     : 1;
@@ -155,7 +160,7 @@ if (!userId) return;
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
                 <span className="ml-4 text-gray-900 font-medium">{destination.name}</span>
-</li>
+              </li>
             </ol>
           </nav>
         </div>
@@ -168,7 +173,7 @@ if (!userId) return;
             {/* Image Gallery */}
             <div className="mb-8">
               <div className="space-y-4">
-                {/* Main Image (dùng mainImage state) */}
+                {/* Main Image */}
                 <div className="relative h-96 rounded-xl overflow-hidden">
                   <img
                     src={mainImage || placeholderLarge}
@@ -190,8 +195,8 @@ if (!userId) return;
                     {currentIndex} / {(Array.isArray(destination.urlPicture) ? destination.urlPicture.length : 1)}
                   </div>
                 </div>
-                
-                {/* Thumbnail Gallery (show all thumbnails, click đổi mainImage) */}
+
+                {/* Thumbnail Gallery */}
                 <div className="grid grid-cols-4 gap-3">
                   {(Array.isArray(destination.urlPicture) && destination.urlPicture.length > 0 ? destination.urlPicture : [placeholderThumb]).map((urlPicture, index) => (
                     <div
@@ -209,7 +214,7 @@ if (!userId) return;
                           target.src = placeholderThumb;
                         }}
                       />
-{index === 3 && Array.isArray(destination.urlPicture) && destination.urlPicture.length > 4 && (
+                      {index === 3 && Array.isArray(destination.urlPicture) && destination.urlPicture.length > 4 && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                           <span className="text-white font-medium">+{destination.urlPicture.length - 4}</span>
                         </div>
@@ -223,21 +228,18 @@ if (!userId) return;
             {/* Destination Info */}
             <div className="bg-white rounded-xl shadow-md p-8 mb-8">
               <h1 className="text-4xl font-bold text-gray-900 mb-4">{destination.name}</h1>
-              
               <div className="flex flex-wrap items-center gap-6 mb-6">
                 <div className="flex items-center space-x-1">
                   <MapPinIcon className="h-5 w-5 text-gray-500" />
                   <span className="text-gray-700">{destination.location}</span>
                 </div>
-                
                 <div className="flex items-center space-x-1">
                   <StarIcon className="h-5 w-5 text-yellow-500" />
                   <span className="font-medium">
-                    {destination.rating > 0 ? destination.rating.toFixed(1) : 'Chưa có đánh giá'}
+                    {averageRating ? averageRating : 'Chưa có đánh giá'}
                   </span>
-                  <span className="text-gray-500">({destination.ratingCount} đánh giá)</span>
+                  <span className="text-gray-500">({destinationReviews.length} đánh giá)</span>
                 </div>
-
                 <div className="flex items-center space-x-1">
                   <TagIcon className="h-5 w-5 text-gray-500" />
                   <span className="text-gray-700">
@@ -245,11 +247,7 @@ if (!userId) return;
                   </span>
                 </div>
               </div>
-
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                {destination.description}
-              </p>
-
+              <p className="text-lg text-gray-700 leading-relaxed mb-6">{destination.description}</p>
               <div className="flex items-center text-sm text-gray-500">
                 <CalendarIcon className="h-4 w-4 mr-1" />
                 <span>Được thêm vào {formatDate(destination.createdDate)}</span>
@@ -268,9 +266,7 @@ if (!userId) return;
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Viết đánh giá của bạn</h3>
                   <form onSubmit={handleSubmitReview}>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Đánh giá
-</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Đánh giá</label>
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -286,16 +282,11 @@ if (!userId) return;
                             )}
                           </button>
                         ))}
-                        <span className="ml-2 text-sm text-gray-600">
-                          {newReview.rating}/5 sao
-                        </span>
+                        <span className="ml-2 text-sm text-gray-600">{newReview.rating}/5 sao</span>
                       </div>
                     </div>
-
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Bình luận
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Bình luận</label>
                       <textarea
                         value={newReview.comment}
                         onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
@@ -305,7 +296,6 @@ if (!userId) return;
                         required
                       />
                     </div>
-
                     <button
                       type="submit"
                       disabled={isSubmitting || !newReview.comment.trim()}
@@ -330,7 +320,7 @@ if (!userId) return;
               {!userId && (destination.status?.toLowerCase() === 'approved' || destination.status === 'Approved') && (
                 <div className="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
                   <p className="text-blue-800">
-<Link to="/login" className="font-medium hover:underline">
+                    <Link to="/login" className="font-medium hover:underline">
                       Đăng nhập
                     </Link>{' '}
                     để viết đánh giá cho địa điểm này
@@ -344,34 +334,30 @@ if (!userId) return;
                   {destinationReviews
                     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                     .map((review) => (
-                    <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
-                      <div className="flex items-start space-x-4">
-                        <div className="bg-blue-100 p-2 rounded-full">
-                          <UserIcon className="h-6 w-6 text-blue-600" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-gray-900">{review.username}</h4>
-                            <span className="text-sm text-gray-500">
-                              {formatDate(review.createdAt)}
-                            </span>
+                      <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
+                        <div className="flex items-start space-x-4">
+                          <div className="bg-blue-100 p-2 rounded-full">
+                            <UserIcon className="h-6 w-6 text-blue-600" />
                           </div>
-                          <div className="flex items-center mb-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <StarSolidIcon
-                                key={star}
-                                className={`h-4 w-4 ${
-                                  star <= review.rating ? 'text-yellow-500' : 'text-gray-300'
-                                }`}
-                              />
-                            ))}
-                            <span className="ml-2 text-sm text-gray-600">{review.rating}/5</span>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-semibold text-gray-900">{review.username}</h4>
+                              <span className="text-sm text-gray-500">{formatDate(review.createdAt)}</span>
+                            </div>
+                            <div className="flex items-center mb-2">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <StarSolidIcon
+                                  key={star}
+                                  className={`h-4 w-4 ${star <= review.rating ? 'text-yellow-500' : 'text-gray-300'}`}
+                                />
+                              ))}
+                              <span className="ml-2 text-sm text-gray-600">{review.rating}/5</span>
+                            </div>
+                            <p className="text-gray-700">{review.comment}</p>
                           </div>
-                          <p className="text-gray-700">{review.comment}</p>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -389,53 +375,42 @@ if (!userId) return;
               <div className="bg-white rounded-xl shadow-md p-6 mb-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Thao tác nhanh</h3>
                 <div className="space-y-3">
-                  <Link
-                    to="/destinations"
-className="block w-full text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    Quay lại danh sách
-                  </Link>
-                  <Link
-                    to="/create-destination"
-                    className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Thêm địa điểm khác
-                  </Link>
+                  <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Lưu địa điểm
+                  </button>
+                  <button className="w-full border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                    Chia sẻ
+                  </button>
                 </div>
               </div>
 
               {/* Related Info */}
               <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Thông tin thêm</h3>
-                <dl className="space-y-3">
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Danh mục</dt>
-                    <dd className="text-sm text-gray-900">
-                      {categories[destination.category as keyof typeof categories] || 'Khác'}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Trạng thái</dt>
-                    <dd>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(destination.status)}`}>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Thông tin liên quan</h3>
+                <div className="space-y-3 text-sm text-gray-600">
+                  <div className="flex items-center space-x-2">
+                    <CheckBadgeIcon className="h-5 w-5 text-green-600" />
+                    <span>
+                      Đã được duyệt bởi hệ thống:{' '}
+                      <span className={getStatusColor(destination.status)}>
                         {getStatusText(destination.status)}
                       </span>
-                    </dd>
+                    </span>
                   </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Ngày tạo</dt>
-                    <dd className="text-sm text-gray-900">{formatDate(destination.createdDate)}</dd>
+                  <div className="flex items-center space-x-2">
+                    <UserIcon className="h-5 w-5 text-blue-600" />
+                    <span>Người tạo: {'Ẩn danh'}</span>
                   </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Số lượt đánh giá</dt>
-                    <dd className="text-sm text-gray-900">{destination.ratingCount} đánh giá</dd>
+                  <div className="flex items-center space-x-2">
+                    <CalendarIcon className="h-5 w-5 text-purple-600" />
+                    <span>Ngày thêm: {formatDate(destination.createdDate)}</span>
                   </div>
-                </dl>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </div> 
     </div>
   );
 };

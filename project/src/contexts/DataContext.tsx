@@ -42,6 +42,7 @@ export interface ReviewComment {
 interface DataContextType {
   destinations: Destination[];
   myOwnDestinations: Destination[];
+  destinationReviews: Review[]; // reviews API
   reviews: Review[];
   comments: Record<number, ReviewComment[]>;
   publicDestinations: Destination[];
@@ -57,12 +58,7 @@ interface DataContextType {
   getDestinationReviews: (destinationId: number) => Promise<void>;
   addReview: (destinationId: number, rating: number, comment: string) => Promise<void>;
   deleteReview: (destinationId: number) => Promise<void>;
-  fetchComments: (reviewId: number) => Promise<void>;
-  addComment: (reviewId: number, content: string) => Promise<void>;
-  updateComment: (commentId: number, content: string) => Promise<void>;
-  deleteComment: (commentId: number) => Promise<void>;
 }
-
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -72,6 +68,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [reviews, setReviews] = useState<Review[]>([]);
   const [comments, setComments] = useState<Record<number, ReviewComment[]>>({});
   const [myOwnDestinations, setMyDestinations] = useState<Destination[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [destinationReviews, setDestinationReviews] = useState<any[]>([]); 
 
   const axiosInstance = axios.create({
     baseURL: api.defaults.baseURL,
@@ -203,29 +201,25 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // ------------------ Reviews ------------------
   const getDestinationReviews = async (destinationId: number) => {
-    try {
-      const response = await api.get(`/reviews/destination/${destinationId}`);
-      setReviews(prev => {
-        const filtered = prev.filter(r => r.destinationId !== destinationId);
-        return [...filtered, ...response.data];
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Fetch reviews failed:", error);
-      return [];
-    }
-  };
-
-  const addReview = async (destinationId: number, rating: number, comment: string) => {
-    if (!token) return;
-    try {
-      await axiosInstance.post(`/Reviews/destination/${destinationId}`, { rating, comment });
-      await getDestinationReviews(destinationId);
-      await fetchDestinations();
-    } catch (err) {
-      console.error('Add review failed:', err);
-    }
-  };
+      try {
+        const response = await api.get(`/Reviews/destination/${destinationId}`);
+        setDestinationReviews(response.data);
+      } catch (error) {
+        console.error("Fetch reviews failed:", error);
+      }
+    };
+  
+    // API: thêm review mới
+    const addReview = async (destinationId: number, rating: number, comment: string) => {
+      if (!token) return;
+      try {
+        await axiosInstance.post(`/Reviews/destination/${destinationId}`, { rating, comment });
+        await getDestinationReviews(destinationId); // load lại reviews
+        await fetchDestinations(); // update rating trung bình
+      } catch (err) {
+        console.error('Add review failed:', err);
+      }
+    };
 
   const deleteReview = async (destinationId: number) => {
     if (!token) return;
@@ -235,46 +229,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await fetchDestinations();
     } catch (err) {
       console.error('Delete review failed:', err);
-    }
-  };
-
-  // ------------------ Comments ------------------
-  const fetchComments = async (reviewId: number) => {
-    try {
-      const res = await publicAxios.get<ReviewComment[]>(`/Reviews/${reviewId}/comments`);
-      setComments(prev => ({ ...prev, [reviewId]: res.data }));
-    } catch (err) {
-      console.error('Fetch comments failed:', err);
-    }
-  };
-
-  const addComment = async (reviewId: number, content: string) => {
-    if (!token) return;
-    try {
-      await axiosInstance.post(`/Reviews/${reviewId}/comments`, { content });
-      await fetchComments(reviewId);
-    } catch (err) {
-      console.error('Add comment failed:', err);
-    }
-  };
-
-  const updateComment = async (commentId: number, content: string) => {
-    if (!token) return;
-    try {
-      await axiosInstance.put(`/Reviews/comments/${commentId}`, { content });
-      Object.keys(comments).forEach(rid => fetchComments(Number(rid)));
-    } catch (err) {
-      console.error('Update comment failed:', err);
-    }
-  };
-
-  const deleteComment = async (commentId: number) => {
-    if (!token) return;
-    try {
-      await axiosInstance.delete(`/Reviews/comments/${commentId}`);
-      Object.keys(comments).forEach(rid => fetchComments(Number(rid)));
-    } catch (err) {
-      console.error('Delete comment failed:', err);
     }
   };
 
@@ -367,10 +321,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         getDestinationReviews,
         addReview,
         deleteReview,
-        fetchComments,
-        addComment,
-        updateComment,
-        deleteComment
+        destinationReviews, // reviews API
       }}
     >
       {children}

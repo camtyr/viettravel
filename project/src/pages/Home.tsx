@@ -4,7 +4,7 @@ import { useData, Destination } from '../contexts/DataContext';
 import { MapPinIcon, StarIcon, UserGroupIcon, TruckIcon, CheckBadgeIcon } from '@heroicons/react/24/solid';
 
 const Home: React.FC = () => {
-  const { publicDestinations, fetchPublicDestinations } = useData();
+  const { publicDestinations, fetchPublicDestinations} = useData();
 
   // Fetch dữ liệu mỗi lần component mount
   useEffect(() => {
