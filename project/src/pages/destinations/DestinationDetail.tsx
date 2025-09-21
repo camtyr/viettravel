@@ -1,3 +1,4 @@
+// src/pages/DestinationDetail.tsx  (hoặc đường dẫn file hiện tại của bạn)
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useData } from '../../contexts/DataContext';
@@ -14,6 +15,9 @@ import {
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
+const placeholderLarge = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800';
+const placeholderThumb = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=400';
+
 const DestinationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { publicDestinations, reviews, addReview, getDestinationReviews } = useData();
@@ -24,11 +28,29 @@ const DestinationDetail: React.FC = () => {
   const destinationId = Number(id);
   const destination = publicDestinations.find(d => d.id === destinationId);
 
+  // mainImage state: ảnh chính hiển thị
+  const [mainImage, setMainImage] = useState<string>(placeholderLarge);
+
   useEffect(() => {
-  if (destinationId) {
-    getDestinationReviews(destinationId);
-  }
-}, [destinationId]);
+    if (destinationId) {
+      getDestinationReviews(destinationId);
+    }
+  }, [destinationId]);
+
+  // khi destination thay đổi (khi data từ context load xong), set mainImage mặc định
+  useEffect(() => {
+    if (destination) {
+      // nếu urlPicture là mảng và có ít nhất 1 ảnh -> set ảnh đầu
+      if (Array.isArray(destination.urlPicture) && destination.urlPicture.length > 0) {
+        setMainImage(destination.urlPicture[0]);
+      } else if (typeof destination.urlPicture === 'string' && (destination.urlPicture as string).length > 0) {
+        // phòng trường hợp urlPicture lưu chuỗi (như single url)
+        setMainImage(destination.urlPicture as string);
+      } else {
+        setMainImage(placeholderLarge);
+      }
+    }
+  }, [destination]);
 
   const destinationReviews = reviews.filter(r => r.destinationId === destinationId);
 
@@ -69,12 +91,15 @@ const DestinationDetail: React.FC = () => {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Approved':
+    switch (status?.toLowerCase()) {
+      case 'approved':
+      case 'đã duyệt':
         return 'text-green-600 bg-green-100';
-      case 'Pending':
+      case 'pending':
+      case 'chờ duyệt':
         return 'text-yellow-600 bg-yellow-100';
-      case 'Rejected':
+      case 'rejected':
+      case 'bị từ chối':
         return 'text-red-600 bg-red-100';
       default:
         return 'text-gray-600 bg-gray-100';
@@ -82,15 +107,12 @@ const DestinationDetail: React.FC = () => {
   };
 
   const getStatusText = (status: string) => {
-    switch (status) {
-      case 'Approved':
-        return 'Đã duyệt';
-      case 'Pending':
-        return 'Chờ duyệt';
-      case 'Rejected':
-        return 'Bị từ chối';
-      default:
-        return 'Không xác định';
+    if (!status) return 'Không xác định';
+    switch (status?.toLowerCase()) {
+      case 'approved': return 'Đã duyệt';
+      case 'pending': return 'Chờ duyệt';
+      case 'rejected': return 'Bị từ chối';
+      default: return status;
     }
   };
 
@@ -102,6 +124,11 @@ const DestinationDetail: React.FC = () => {
     mountain: 'Núi',
     city: 'Thành phố',
   };
+
+  // compute index hiển thị (1-based)
+  const currentIndex = Array.isArray(destination.urlPicture)
+    ? Math.max(1, destination.urlPicture.findIndex(img => img === mainImage) + 1)
+    : 1;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -140,63 +167,16 @@ const DestinationDetail: React.FC = () => {
           <div className="lg:col-span-2">
             {/* Image Gallery */}
             <div className="mb-8">
-              {destination.urlPicture && destination.urlPicture.length > 1 ? (
-                <div className="space-y-4">
-                  {/* Main Image */}
-                  <div className="relative h-96 rounded-xl overflow-hidden">
-                    <img
-                      src={destination.urlPicture[0]}
-                      alt={destination.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800';
-                      }}
-                    />
-                    <div className="absolute top-4 right-4">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(destination.status)}`}>
-                        {destination.status === 'Approved' && <CheckBadgeIcon className="h-4 w-4 mr-1" />}
-                        {destination.status === 'Pending' && <ClockIcon className="h-4 w-4 mr-1" />}
-                        {getStatusText(destination.status)}
-                      </span>
-                    </div>
-                    <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">
-                      1 / {destination.urlPicture.length}
-                    </div>
-                  </div>
-                  
-                  {/* Thumbnail Gallery */}
-                  <div className="grid grid-cols-4 gap-3">
-                    {destination.urlPicture.slice(1, 5).map((urlPicture, index) => (
-                      <div key={index} className="relative h-24 rounded-lg overflow-hidden">
-                        <img
-                          src={urlPicture}
-                          alt={`${destination.name} ${index + 2}`}
-                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300 cursor-pointer"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=400';
-                          }}
-                        />
-                        {index === 3 && destination.urlPicture && destination.urlPicture.length > 5 && (
-                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                            <span className="text-white font-medium">+{destination.urlPicture.length - 4}</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                /* Single Image */
+              <div className="space-y-4">
+                {/* Main Image (dùng mainImage state) */}
                 <div className="relative h-96 rounded-xl overflow-hidden">
                   <img
-                    src={destination.urlPicture[0]}
+                    src={mainImage || placeholderLarge}
                     alt={destination.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800';
+                      target.src = placeholderLarge;
                     }}
                   />
                   <div className="absolute top-4 right-4">
@@ -206,10 +186,39 @@ const DestinationDetail: React.FC = () => {
                       {getStatusText(destination.status)}
                     </span>
                   </div>
+                  <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">
+                    {currentIndex} / {(Array.isArray(destination.urlPicture) ? destination.urlPicture.length : 1)}
+                  </div>
                 </div>
-              )}
+                
+                {/* Thumbnail Gallery (show all thumbnails, click đổi mainImage) */}
+                <div className="grid grid-cols-4 gap-3">
+                  {(Array.isArray(destination.urlPicture) && destination.urlPicture.length > 0 ? destination.urlPicture : [placeholderThumb]).map((urlPicture, index) => (
+                    <div
+                      key={index}
+                      className={`relative h-24 rounded-lg overflow-hidden cursor-pointer border-2 
+                        ${mainImage === urlPicture ? 'border-blue-500' : 'border-transparent'}`}
+                      onClick={() => setMainImage(urlPicture)}
+                    >
+                      <img
+                        src={urlPicture || placeholderThumb}
+                        alt={`${destination.name} ${index + 1}`}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = placeholderThumb;
+                        }}
+                      />
+                      {index === 3 && Array.isArray(destination.urlPicture) && destination.urlPicture.length > 4 && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                          <span className="text-white font-medium">+{destination.urlPicture.length - 4}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-
 
             {/* Destination Info */}
             <div className="bg-white rounded-xl shadow-md p-8 mb-8">
@@ -254,7 +263,7 @@ const DestinationDetail: React.FC = () => {
               </h2>
 
               {/* Add Review Form */}
-              {userId && destination.status === 'Approved' && (
+              {userId && (destination.status?.toLowerCase() === 'approved' || destination.status === 'Approved') && (
                 <div className="mb-8 p-6 bg-gray-50 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Viết đánh giá của bạn</h3>
                   <form onSubmit={handleSubmitReview}>
@@ -318,7 +327,7 @@ const DestinationDetail: React.FC = () => {
                 </div>
               )}
 
-              {!userId && destination.status === 'Approved' && (
+              {!userId && (destination.status?.toLowerCase() === 'approved' || destination.status === 'Approved') && (
                 <div className="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
                   <p className="text-blue-800">
                     <Link to="/login" className="font-medium hover:underline">
