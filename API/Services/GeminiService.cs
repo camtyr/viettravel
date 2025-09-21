@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using API.DTOs;
 using API.Interfaces;
 using Microsoft.Extensions.Configuration;
 
@@ -16,21 +17,36 @@ namespace API.Services
             _apiKey = config["GeminiApiKey"] ?? "DefaultGem";
         }
 
-        public async Task<string> GetChatResponse(string prompt)
+        public async Task<string> GetChatResponse(List<ChatMessageDto> history, List<Destination> destinations)
         {
-            var requestBody = new
+            var dbContextText = string.Join("\n", destinations.Select(d =>
+                $"Tên: {d.Name}, Vị trí: {d.Location}, Loại: {d.Category}, " +
+                $"Mô tả: {d.Description}, Đánh giá: {d.Rating}/5 ({d.RatingCount} lượt)"
+            ));
+
+            var systemPrompt =
+                "Bạn là trợ lý du lịch. Chỉ sử dụng thông tin trong cơ sở dữ liệu dưới đây để xử lý và trả lời. " +
+                "Nếu câu hỏi không có trong dữ liệu, hãy trả lời rằng bạn không tìm thấy thông tin.\n\n" +
+                $"Dữ liệu địa điểm:\n{dbContextText}";
+
+            var contents = new List<object>();
+
+            contents.Add(new
             {
-                contents = new[]
+                role = "user",
+                parts = new[] { new { text = systemPrompt } }
+            });
+
+            foreach (var msg in history)
+            {
+                contents.Add(new
                 {
-                    new
-                    {
-                        parts = new[]
-                        {
-                            new {text = prompt }
-                        }
-                    }
-                },
-            };
+                    role = msg.Role,
+                    parts = new[] { new { text = msg.Text } }
+                });
+            }
+
+            var requestBody = new { contents };
 
             var request = new HttpRequestMessage(
                 HttpMethod.Post,
@@ -62,7 +78,7 @@ namespace API.Services
             }
             else
             {
-                throw new HttpRequestException($"Request failed with status code: {response.StatusCode}, { await response.Content.ReadAsStringAsync() }");
+                throw new HttpRequestException($"Request failed with status code: {response.StatusCode}, {await response.Content.ReadAsStringAsync()}");
             }
         }
     }

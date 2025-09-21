@@ -1,12 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
-import { 
-  ChatBubbleLeftRightIcon, 
-  XMarkIcon, 
+import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import {
+  ChatBubbleLeftRightIcon,
+  XMarkIcon,
   PaperAirplaneIcon,
   SparklesIcon,
-  UserIcon
-} from '@heroicons/react/24/outline';
+  UserIcon,
+} from "@heroicons/react/24/outline";
 
 interface Message {
   id: string;
@@ -19,18 +19,18 @@ const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      text: 'Xin chào! Tôi là trợ lý AI của VietTravel. Tôi có thể giúp bạn tìm hiểu về các địa điểm du lịch, hướng dẫn sử dụng website hoặc trả lời các câu hỏi về du lịch Việt Nam. Bạn cần hỗ trợ gì?',
+      id: "1",
+      text: "Xin chào! Tôi là trợ lý AI của VietTravel. Tôi có thể giúp bạn tìm hiểu về các địa điểm du lịch, hướng dẫn sử dụng website hoặc trả lời các câu hỏi về du lịch Việt Nam. Bạn cần hỗ trợ gì?",
       isBot: true,
       timestamp: new Date(),
     },
   ]);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -47,19 +47,23 @@ const ChatBot: React.FC = () => {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputText('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInputText("");
     setIsTyping(true);
 
     try {
-      // Gọi API Chat
-      const token = localStorage.getItem('token'); // Hoặc từ context
+      const token = localStorage.getItem("token");
       const response = await axios.post(
-        'http://localhost:5000/api/Chat/chat',
-        inputText,
+        "http://localhost:5000/api/Chat/chat",
+        {
+          history: [...messages, userMessage].map((m) => ({
+            role: m.isBot ? "model" : "user",
+            text: m.text,
+          })),
+        },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -72,32 +76,32 @@ const ChatBot: React.FC = () => {
         timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
-        text: 'Xin lỗi, hiện tại không thể kết nối tới server.',
+        text: "Xin lỗi, hiện tại không thể kết nối tới server.",
         isBot: true,
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('vi-VN', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -107,9 +111,9 @@ const ChatBot: React.FC = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-lg transition-all duration-300 ${
-          isOpen 
-            ? 'bg-red-600 hover:bg-red-700' 
-            : 'bg-blue-600 hover:bg-blue-700'
+          isOpen
+            ? "bg-red-600 hover:bg-red-700"
+            : "bg-blue-600 hover:bg-blue-700"
         } text-white`}
       >
         {isOpen ? (
@@ -130,7 +134,9 @@ const ChatBot: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-semibold">Trợ lý AI VietTravel</h3>
-                <p className="text-xs text-blue-100">Luôn sẵn sàng hỗ trợ bạn</p>
+                <p className="text-xs text-blue-100">
+                  Luôn sẵn sàng hỗ trợ bạn
+                </p>
               </div>
             </div>
           </div>
@@ -140,29 +146,41 @@ const ChatBot: React.FC = () => {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
+                className={`flex ${
+                  message.isBot ? "justify-start" : "justify-end"
+                }`}
               >
-                <div className={`flex items-start space-x-2 max-w-[80%] ${
-                  message.isBot ? 'flex-row' : 'flex-row-reverse space-x-reverse'
-                }`}>
-                  <div className={`p-2 rounded-full ${
-                    message.isBot ? 'bg-blue-100' : 'bg-gray-100'
-                  }`}>
+                <div
+                  className={`flex items-start space-x-2 max-w-[80%] ${
+                    message.isBot
+                      ? "flex-row"
+                      : "flex-row-reverse space-x-reverse"
+                  }`}
+                >
+                  <div
+                    className={`p-2 rounded-full ${
+                      message.isBot ? "bg-blue-100" : "bg-gray-100"
+                    }`}
+                  >
                     {message.isBot ? (
                       <SparklesIcon className="h-4 w-4 text-blue-600" />
                     ) : (
                       <UserIcon className="h-4 w-4 text-gray-600" />
                     )}
                   </div>
-                  <div className={`p-3 rounded-lg ${
-                    message.isBot 
-                      ? 'bg-gray-100 text-gray-800' 
-                      : 'bg-blue-600 text-white'
-                  }`}>
+                  <div
+                    className={`p-3 rounded-lg ${
+                      message.isBot
+                        ? "bg-gray-100 text-gray-800"
+                        : "bg-blue-600 text-white"
+                    }`}
+                  >
                     <p className="text-sm leading-relaxed">{message.text}</p>
-                    <p className={`text-xs mt-1 ${
-                      message.isBot ? 'text-gray-500' : 'text-blue-100'
-                    }`}>
+                    <p
+                      className={`text-xs mt-1 ${
+                        message.isBot ? "text-gray-500" : "text-blue-100"
+                      }`}
+                    >
                       {formatTime(message.timestamp)}
                     </p>
                   </div>
@@ -180,8 +198,14 @@ const ChatBot: React.FC = () => {
                   <div className="bg-gray-100 p-3 rounded-lg">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
                     </div>
                   </div>
                 </div>

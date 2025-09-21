@@ -5,11 +5,6 @@ using Microsoft.Extensions.Configuration;
 
 namespace API.Services
 {
-    public interface ICloudinaryService
-    {
-        Task<string> UploadImageAsync(IFormFile file);
-    }
-
     public class CloudinaryService : ICloudinaryService
     {
         private readonly Cloudinary _cloudinary;

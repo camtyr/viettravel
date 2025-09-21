@@ -19,6 +19,8 @@ public static class ApplicationServiceExtensions
         });
 
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ICloudinaryService, CloudinaryService>();
+        services.AddScoped<IDestinationRepository, DestinationRepository>();
         services.AddHttpClient<IGeminiService, GeminiService>();
 
         services.AddCors(opt =>
