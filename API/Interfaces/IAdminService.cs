@@ -1,16 +1,17 @@
-using API.Entities;
+using API.DTOs;
 
 namespace API.Interfaces
 {
     public interface IAdminService
     {
         Task<object> GetDashboardStats();
-        Task<IEnumerable<Destination>> GetAllDestinations();
-        Task<IEnumerable<Destination>> GetPendingDestinations();
-        Task<IEnumerable<Destination>> GetApprovedDestinations();
-        Task<IEnumerable<Destination>> GetRejectedDestinations();
-        Task ApproveDestination(int id);
-        Task RejectDestination(int id);
-        Task DeleteDestination(int id);
+        Task<IEnumerable<DestinationDto>> GetAllDestinations();
+        Task<IEnumerable<DestinationDto>> GetPendingDestinations();
+        Task<IEnumerable<DestinationDto>> GetApprovedDestinations();
+        Task<IEnumerable<DestinationDto>> GetRejectedDestinations();
+        Task<DestinationDto?> GetDestinationById(int id);
+        Task ApproveDestination(int id, int adminId);
+        Task RejectDestination(int id, int adminId);
+        Task DeleteDestination(int id, int adminId);
     }
 }

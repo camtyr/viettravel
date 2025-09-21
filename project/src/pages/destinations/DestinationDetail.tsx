@@ -74,7 +74,7 @@ const DestinationDetail: React.FC = () => {
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) return;
+if (!userId) return;
 
     setIsSubmitting(true);
     await addReview(destination.id, newReview.rating, newReview.comment.trim());
@@ -155,7 +155,7 @@ const DestinationDetail: React.FC = () => {
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
                 <span className="ml-4 text-gray-900 font-medium">{destination.name}</span>
-              </li>
+</li>
             </ol>
           </nav>
         </div>
@@ -209,7 +209,7 @@ const DestinationDetail: React.FC = () => {
                           target.src = placeholderThumb;
                         }}
                       />
-                      {index === 3 && Array.isArray(destination.urlPicture) && destination.urlPicture.length > 4 && (
+{index === 3 && Array.isArray(destination.urlPicture) && destination.urlPicture.length > 4 && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                           <span className="text-white font-medium">+{destination.urlPicture.length - 4}</span>
                         </div>
@@ -270,7 +270,7 @@ const DestinationDetail: React.FC = () => {
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Đánh giá
-                      </label>
+</label>
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -330,7 +330,7 @@ const DestinationDetail: React.FC = () => {
               {!userId && (destination.status?.toLowerCase() === 'approved' || destination.status === 'Approved') && (
                 <div className="mb-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
                   <p className="text-blue-800">
-                    <Link to="/login" className="font-medium hover:underline">
+<Link to="/login" className="font-medium hover:underline">
                       Đăng nhập
                     </Link>{' '}
                     để viết đánh giá cho địa điểm này
@@ -391,7 +391,7 @@ const DestinationDetail: React.FC = () => {
                 <div className="space-y-3">
                   <Link
                     to="/destinations"
-                    className="block w-full text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+className="block w-full text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     Quay lại danh sách
                   </Link>
