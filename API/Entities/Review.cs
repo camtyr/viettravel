@@ -15,5 +15,3 @@ namespace API.Entities
         public DateTime? UpdatedAt { get; set; }
     }
 }
-
-

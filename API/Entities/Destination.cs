@@ -13,6 +13,7 @@ public class Destination
     public int RatingCount { get; set; } = 0;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public int? CreatedById { get; set; }
+    
 
     public ICollection<DestinationImage> Images { get; set; } = new List<DestinationImage>();
 }

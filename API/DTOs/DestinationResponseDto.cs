@@ -8,4 +8,7 @@
     public string Status { get; set; } = "Pending";
     public List<string> ImageUrls { get; set; } = new List<string>();
     public DateTime CreatedDate { get; set; }
+    public double Rating { get; set; } = 0;
+    public int RatingCount { get; set; } = 0;
+
 }

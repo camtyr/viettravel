@@ -371,18 +371,7 @@ const averageRating = avg > 0 ? avg.toFixed(1) : null;
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
-              {/* Quick Actions */}
-              <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Thao tác nhanh</h3>
-                <div className="space-y-3">
-                  <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    Lưu địa điểm
-                  </button>
-                  <button className="w-full border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                    Chia sẻ
-                  </button>
-                </div>
-              </div>
+             
 
               {/* Related Info */}
               <div className="bg-white rounded-xl shadow-md p-6">

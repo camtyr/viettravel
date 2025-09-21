@@ -79,19 +79,22 @@ namespace API.Controllers
         {
             var exists = await _context.Destinations.AnyAsync(d => d.Id == destinationId && d.Status == "Approved");
             if (!exists) return NotFound();
-
-            var reviews = await _context.Reviews
+var reviews = await _context.Reviews
                 .Where(r => r.DestinationId == destinationId)
                 .OrderByDescending(r => r.CreatedAt)
-                .Select(r => new
-                {
-                    r.Id,
-                    r.Rating,
-                    r.Comment,
-                    r.CreatedAt,
-                    r.UpdatedAt,
-                    r.UserId
-                })
+                .Join(_context.Users,
+                      r => r.UserId,
+                      u => u.Id,
+                      (r, u) => new API.DTOs.ReviewDto
+                      {
+                          Id = r.Id,
+                          Rating = r.Rating,
+                          Comment = r.Comment,
+                          CreatedAt = r.CreatedAt,
+                          UpdatedAt = r.UpdatedAt,
+                          UserId = r.UserId,
+                          Username = u.UserName
+                      })
                 .ToListAsync();
 
             return Ok(reviews);
@@ -159,7 +162,7 @@ namespace API.Controllers
         public async Task<ActionResult> UpdateComment(int commentId, ReviewCommentUpdateDto dto)
         {
             var userId = GetUserId();
-            var comment = await _context.ReviewComments.FirstOrDefaultAsync(c => c.Id == commentId && c.UserId == userId);
+var comment = await _context.ReviewComments.FirstOrDefaultAsync(c => c.Id == commentId && c.UserId == userId);
             if (comment == null) return NotFound();
             comment.Content = dto.Content;
             comment.UpdatedAt = DateTime.UtcNow;
@@ -204,5 +207,3 @@ namespace API.Controllers
         }
     }
 }
-
-

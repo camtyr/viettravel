@@ -72,7 +72,9 @@ namespace API.Controllers
                 Description = destination.Description,
                 Status = destination.Status,
                 CreatedDate = destination.CreatedDate,
-                ImageUrls = destination.Images.Select(i => i.Url).ToList()
+                ImageUrls = destination.Images.Select(i => i.Url).ToList(),
+                Rating = destination.Rating,
+                RatingCount = destination.RatingCount
             });
         }
 
@@ -80,7 +82,7 @@ namespace API.Controllers
         [HttpGet("approved")]
         public async Task<ActionResult<IEnumerable<DestinationResponseDto>>> GetApprovedDestinations()
         {
-            var destinations = await _context.Destinations
+var destinations = await _context.Destinations
                 .Include(d => d.Images)
                 .Where(d => d.Status == "Approved")
                 .ToListAsync();
@@ -94,7 +96,9 @@ namespace API.Controllers
                 Description = d.Description,
                 Status = d.Status,
                 CreatedDate = d.CreatedDate,
-                ImageUrls = d.Images.Select(i => i.Url).ToList()
+                ImageUrls = d.Images.Select(i => i.Url).ToList(),
+                Rating = d.Rating,
+                RatingCount = d.RatingCount
             }));
         }
 
@@ -117,7 +121,9 @@ namespace API.Controllers
                 Description = destination.Description,
                 Status = destination.Status,
                 CreatedDate = destination.CreatedDate,
-                ImageUrls = destination.Images.Select(i => i.Url).ToList()
+                ImageUrls = destination.Images.Select(i => i.Url).ToList(),
+                Rating = destination.Rating,
+                RatingCount = destination.RatingCount
             });
         }
 
@@ -142,7 +148,9 @@ namespace API.Controllers
                 Description = d.Description,
                 Status = d.Status,
                 CreatedDate = d.CreatedDate,
-                ImageUrls = d.Images.Select(i => i.Url).ToList()
+                ImageUrls = d.Images.Select(i => i.Url).ToList(),
+                Rating = d.Rating,
+                RatingCount = d.RatingCount
             }));
         }
 
@@ -151,7 +159,7 @@ namespace API.Controllers
         [HttpGet("my/pending")]
         public async Task<ActionResult<IEnumerable<DestinationResponseDto>>> GetMyPendingDestinations()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var destinations = await _context.Destinations
                 .Include(d => d.Images)
@@ -227,8 +235,7 @@ namespace API.Controllers
         public async Task<ActionResult<DestinationResponseDto>> UpdateMyDestination(int id, [FromForm] DestinationCreateDto dto)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            var destination = await _context.Destinations
+var destination = await _context.Destinations
                 .Include(d => d.Images)
                 .FirstOrDefaultAsync(d => d.Id == id && d.CreatedById == userId);
 
@@ -301,7 +308,7 @@ namespace API.Controllers
             {
                 Id = destination.Id,
                 Name = destination.Name,
-                Location = destination.Location,
+Location = destination.Location,
                 Category = destination.Category,
                 Description = destination.Description,
                 Status = destination.Status,
