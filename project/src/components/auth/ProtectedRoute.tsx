@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -8,17 +8,13 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
-  const { token, role } = useAuth();
+  const { token, role, loading } = useAuth();
+  const location = useLocation();
 
-  // Nếu chưa login -> chuyển hướng về login
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
+  if (loading) return <div>Loading...</div>; 
 
-  // Nếu có requiredRole nhưng user không đúng quyền -> chuyển hướng về Home
-  if (requiredRole && role !== requiredRole) {
-    return <Navigate to="/" replace />;
-  }
+  if (!token) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (requiredRole && role !== requiredRole) return <div>Bạn không có quyền truy cập trang này</div>;
 
   return <>{children}</>;
 };

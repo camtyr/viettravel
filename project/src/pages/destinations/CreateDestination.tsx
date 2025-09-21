@@ -261,7 +261,7 @@ const CreateDestination: React.FC = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg"
               />
               <p className="mt-2 text-sm text-gray-500">
-                Tối thiểu 100 ký tự ({formData.description.length}/100)
+                Tối thiểu 10 ký tự ({formData.description.length}/10)
               </p>
             </div>
           </div>
@@ -277,7 +277,7 @@ const CreateDestination: React.FC = () => {
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || formData.description.length < 100 || selectedImages.length === 0}
+              disabled={isSubmitting || formData.description.length < 10 || selectedImages.length === 0}
               className="flex items-center px-8 py-3 bg-blue-600 text-white rounded-lg disabled:opacity-50"
             >
               {isSubmitting ? 'Đang tạo...' : (

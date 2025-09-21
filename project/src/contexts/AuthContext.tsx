@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "../BaseUrl";
 
@@ -8,6 +7,7 @@ interface AuthContextType {
   token: string | null;
   email: string | null;
   role: string | null;
+  loading: boolean; // thêm loading vào context
   register: (username: string, email: string, password: string) => Promise<boolean>;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
@@ -25,8 +25,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Load từ localStorage khi mở app
   useEffect(() => {
     const storedId = localStorage.getItem("id");
     const storedToken = localStorage.getItem("token");
@@ -41,17 +41,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setEmail(storedEmail);
       setRole(storedRole);
     }
+    setLoading(false);
   }, []);
 
-  // Đăng ký
-  const register = async (username: string, email: string, password: string): Promise<boolean> => {
+  const register = async (username: string, email: string, password: string) => {
     try {
-      const res = await api.post("/Account/register", {
-        userName: username,
-        email,
-        password,
-      });
-
+      const res = await api.post("/Account/register", { userName: username, email, password });
       localStorage.setItem("id", res.data.id);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("username", res.data.username);
@@ -63,7 +58,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserName(res.data.username);
       setEmail(res.data.email);
       setRole(res.data.role);
-
       return true;
     } catch (error) {
       console.error("Register error:", error);
@@ -71,14 +65,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Đăng nhập
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string) => {
     try {
-      const res = await api.post("/Account/login", {
-        email,
-        password,
-      });
-
+      const res = await api.post("/Account/login", { email, password });
       localStorage.setItem("id", res.data.id);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("username", res.data.username);
@@ -90,7 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserName(res.data.username);
       setEmail(res.data.email);
       setRole(res.data.role);
-
       return true;
     } catch (error) {
       console.error("Login error:", error);
@@ -98,14 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Đăng xuất
   const logout = () => {
-    localStorage.removeItem("id");
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("email");
-    localStorage.removeItem("role");
-
+    localStorage.clear();
     setId(null);
     setToken(null);
     setUserName(null);
@@ -113,52 +95,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setRole(null);
   };
 
-  // Đổi mật khẩu
-  const changePassword = async (
-    oldPassword: string,
-    newPassword: string
-  ): Promise<{ success: boolean; message?: string }> => {
-    if (!token) {
-      return { success: false, message: "Bạn chưa đăng nhập" };
-    }
-
+  const changePassword = async (oldPassword: string, newPassword: string) => {
+    if (!token) return { success: false, message: "Bạn chưa đăng nhập" };
     try {
-      await api.post(
-        "/Account/change-password",
-        { oldPassword, newPassword },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post("/Account/change-password", { oldPassword, newPassword }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return { success: true, message: "Đổi mật khẩu thành công" };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error("Change password error:", error);
-
-      let msg = "Có lỗi xảy ra khi đổi mật khẩu";
-      if (error.response?.data) {
-        msg = error.response.data;
-      }
+      const msg = error.response?.data || "Có lỗi xảy ra khi đổi mật khẩu";
       return { success: false, message: msg };
     }
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        id,
-        username,
-        token,
-        email,
-        role,
-        register,
-        login,
-        logout,
-        changePassword,
-      }}
-    >
+    <AuthContext.Provider value={{ id, username, token, email, role, loading, register, login, logout, changePassword }}>
       {children}
     </AuthContext.Provider>
   );

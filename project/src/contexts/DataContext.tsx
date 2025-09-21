@@ -1,7 +1,9 @@
+// src/contexts/DataContext.tsx
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
 import api from '../BaseUrl';
+import * as signalR from '@microsoft/signalr';
 
 export interface Destination {
   id: number;
@@ -42,25 +44,16 @@ interface DataContextType {
   myOwnDestinations: Destination[];
   reviews: Review[];
   comments: Record<number, ReviewComment[]>;
+  publicDestinations: Destination[];
   fetchDestinations: () => Promise<void>;
   fetchMyDestinations: () => Promise<void>;
+  fetchPublicDestinations: () => Promise<void>;
   searchDestinations: (keyword: string) => Promise<void>;
-  addDestination: (data: {
-    name: string;
-    location: string;
-    category: string;
-    description: string;
-    files: File[];
-  }) => Promise<void>;
-  updateMyDestination: (id: number, data: {
-    name: string;
-    location: string;
-    category: string;
-    description: string;
-    file?: File;
-  }) => Promise<void>;
+  addDestination: (data: { name: string; location: string; category: string; description: string; files: File[] }) => Promise<void>;
+  updateMyDestination: (id: number, data: { name: string; location: string; category: string; description: string; file?: File }) => Promise<void>;
   updateDestination: (id: number, action: 'Approve' | 'Reject') => Promise<void>;
   deleteDestination: (id: number) => Promise<void>;
+  deleteMyDestination: (id: number) => Promise<void>;
   getDestinationReviews: (destinationId: number) => Promise<void>;
   addReview: (destinationId: number, rating: number, comment: string) => Promise<void>;
   deleteReview: (destinationId: number) => Promise<void>;
@@ -68,9 +61,6 @@ interface DataContextType {
   addComment: (reviewId: number, content: string) => Promise<void>;
   updateComment: (commentId: number, content: string) => Promise<void>;
   deleteComment: (commentId: number) => Promise<void>;
-  publicDestinations: Destination[];
-  fetchPublicDestinations: () => Promise<void>;
-  deleteMyDestination: (id: number) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -87,33 +77,42 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     baseURL: api.defaults.baseURL,
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
-
   const publicAxios = axios.create({ baseURL: api.defaults.baseURL });
 
-  // ------------------ Public Destinations ------------------
+  // ------------------ HELPER: MAP IMAGE ------------------
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapDestinationImages = (dest: any): Destination => ({
+    ...dest,
+    urlPicture: dest.imageUrls ?? [],
+  });
+
+  // ------------------ API FETCH ------------------
   const fetchPublicDestinations = async () => {
     try {
       const res = await publicAxios.get<Destination[]>('/Destinations/approved');
-      // map imageUrls => urlPicture
-      const mapped = res.data.map(dest => ({
-        ...dest,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        urlPicture: (dest as any).imageUrls ?? [],
-      }));
-      setPublicDestinations(mapped);
+      setPublicDestinations(res.data.map(mapDestinationImages));
     } catch (err) {
       console.error('Fetch public destinations failed:', err);
     }
   };
 
-  // ------------------ Admin Destinations ------------------
   const fetchDestinations = async () => {
     if (!token || role !== 'Admin') return;
     try {
       const res = await axiosInstance.get<Destination[]>('/Admin/destinations/all');
-      setDestinations(res.data);
+      setDestinations(res.data.map(mapDestinationImages));
     } catch (err) {
       console.error('Fetch admin destinations failed:', err);
+    }
+  };
+
+  const fetchMyDestinations = async () => {
+    if (!token) return;
+    try {
+      const res = await axiosInstance.get<Destination[]>('/Destinations/my');
+      setMyDestinations(res.data.map(mapDestinationImages));
+    } catch (err) {
+      console.error('Fetch my destinations failed:', err);
     }
   };
 
@@ -121,77 +120,48 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!token) return;
     try {
       const res = await axiosInstance.get<Destination[]>(`/Destinations/search?keyword=${encodeURIComponent(keyword)}`);
-      setDestinations(res.data);
+      setDestinations(res.data.map(mapDestinationImages));
     } catch (err) {
       console.error('Search destinations failed:', err);
     }
   };
 
-  // ------------------ User Destinations ------------------
-  const addDestination = async (data: {
-    name: string;
-    location: string;
-    category: string;
-    description: string;
-    files: File[];
-  }) => {
-    if (!token) return;
-
-    if (!data.files || data.files.length === 0) {
-      console.error('No files provided');
-      return;
-    }
-
+  // ------------------ CRUD ------------------
+  const addDestination = async (data: { name: string; location: string; category: string; description: string; files: File[] }) => {
+    if (!token || !data.files.length) return;
     try {
       const formData = new FormData();
       formData.append("Name", data.name);
       formData.append("Location", data.location);
       formData.append("Category", data.category);
       formData.append("Description", data.description);
-
-      data.files.forEach((file) => formData.append("Files", file));
+      data.files.forEach(file => formData.append("Files", file));
 
       const res = await axiosInstance.post<Destination>("/Destinations", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`
-        }
+        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` }
       });
 
-      setMyDestinations(prev => [...prev, res.data]);
+      setMyDestinations(prev => [...prev, mapDestinationImages(res.data)]);
     } catch (err) {
       console.error("Add destination failed:", err);
     }
   };
 
-  const updateMyDestination = async (id: number, data: {
-    name: string;
-    location: string;
-    category: string;
-    description: string;
-    file?: File;
-  }) => {
+  const updateMyDestination = async (id: number, data: { name: string; location: string; category: string; description: string; file?: File }) => {
     if (!token) return;
-
     try {
       const formData = new FormData();
       formData.append("Name", data.name);
       formData.append("Location", data.location);
       formData.append("Category", data.category);
       formData.append("Description", data.description);
-
-      if (data.file) {
-        formData.append("File", data.file);
-      }
+      if (data.file) formData.append("File", data.file);
 
       const res = await axiosInstance.put<Destination>(`/Destinations/my/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`
-        }
+        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` }
       });
 
-      setMyDestinations(prev => prev.map(d => (d.id === id ? res.data : d)));
+      setMyDestinations(prev => prev.map(d => (d.id === id ? mapDestinationImages(res.data) : d)));
     } catch (err) {
       console.error("Update my destination failed:", err);
     }
@@ -231,16 +201,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const fetchMyDestinations = async () => {
-    if (!token) return;
-    try {
-      const res = await axiosInstance.get<Destination[]>('/Destinations/my');
-      setMyDestinations(res.data);
-    } catch (err) {
-      console.error('Fetch my destinations failed:', err);
-    }
-  };
-
   // ------------------ Reviews ------------------
   const getDestinationReviews = async (destinationId: number) => {
     try {
@@ -251,7 +211,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
       return response.data;
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách review:", error);
+      console.error("Fetch reviews failed:", error);
       return [];
     }
   };
@@ -318,16 +278,73 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // ------------------ Effects ------------------
+  // ------------------ SIGNALR ------------------
+  useEffect(() => {
+    if (!token) return;
+
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(`${api.defaults.baseURL}/hubs/data`, { accessTokenFactory: () => token })
+      .withAutomaticReconnect()
+      .build();
+
+    connection.start()
+      .then(() => console.log('SignalR connected'))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((err: any) => console.error('SignalR connection error:', err));
+
+    connection.on('DestinationUpdated', (updated: Destination) => {
+      setPublicDestinations(prev => {
+        const idx = prev.findIndex(d => d.id === updated.id);
+        if (idx >= 0) prev[idx] = updated;
+        else prev.push(updated);
+        return [...prev];
+      });
+      setDestinations(prev => {
+        const idx = prev.findIndex(d => d.id === updated.id);
+        if (idx >= 0) prev[idx] = updated;
+        else prev.push(updated);
+        return [...prev];
+      });
+      setMyDestinations(prev => {
+        const idx = prev.findIndex(d => d.id === updated.id);
+        if (idx >= 0) prev[idx] = updated;
+        return [...prev];
+      });
+    });
+
+    connection.on('ReviewUpdated', (updated: Review) => {
+      setReviews(prev => {
+        const idx = prev.findIndex(r => r.id === updated.id);
+        if (idx >= 0) prev[idx] = updated;
+        else prev.push(updated);
+        return [...prev];
+      });
+    });
+
+    connection.on('CommentUpdated', (updated: ReviewComment) => {
+      setComments(prev => {
+        const prevComments = prev[updated.reviewId] || [];
+        const idx = prevComments.findIndex(c => c.id === updated.id);
+        if (idx >= 0) prevComments[idx] = updated;
+        else prevComments.push(updated);
+        return { ...prev, [updated.reviewId]: [...prevComments] };
+      });
+    });
+
+    return () => {
+      connection.stop();
+    };
+  }, [token]);
+
+  // ------------------ INITIAL FETCH ------------------
   useEffect(() => {
     fetchPublicDestinations();
   }, []);
 
   useEffect(() => {
-    if (token) {
-      fetchDestinations();
-      fetchMyDestinations();
-    }
+    if (!token) return;
+    fetchDestinations();
+    fetchMyDestinations();
   }, [token]);
 
   return (
@@ -346,14 +363,14 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         updateMyDestination,
         updateDestination,
         deleteDestination,
+        deleteMyDestination,
         getDestinationReviews,
         addReview,
         deleteReview,
         fetchComments,
         addComment,
         updateComment,
-        deleteComment,
-        deleteMyDestination
+        deleteComment
       }}
     >
       {children}
