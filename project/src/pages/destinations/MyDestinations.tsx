@@ -167,7 +167,7 @@ const MyDestinations: React.FC = () => {
 
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                       <Link
-                        to={`/destinations/${destination.id}`}
+                        to={`/destinations-detail/${destination.id}`}
                         className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 transition-colors"
                       >
                         <EyeIcon className="h-4 w-4" />

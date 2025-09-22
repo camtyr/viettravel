@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, MapPinIcon, CalendarIcon, TagIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, MapPinIcon, CalendarIcon, TagIcon, StarIcon, UserIcon } from '@heroicons/react/24/outline';
+import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
+
+interface Review {
+  id: number;
+  username: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
 
 interface DestinationDetail {
   id: number;
@@ -11,12 +20,14 @@ interface DestinationDetail {
   description: string;
   createdDate: string;
   imageUrls: string[];
+  status: string;
 }
 
 const AdminDestinationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [destination, setDestination] = useState<DestinationDetail | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,8 +45,22 @@ const AdminDestinationDetail: React.FC = () => {
     fetchDestination();
   }, [id]);
 
+  useEffect(() => {
+    if (id) {
+      fetch(`http://localhost:5000/api/Reviews/destination/${id}`)
+        .then(res => res.json())
+        .then(data => setReviews(data))
+        .catch(err => console.error("Lỗi khi load reviews:", err));
+    }
+  }, [id]);
+
   if (loading) return <div className="text-center py-16 text-gray-600">Đang tải...</div>;
   if (!destination) return <div className="text-center py-16 text-gray-600">Không tìm thấy địa điểm</div>;
+
+  const averageRating =
+    reviews.length > 0
+      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+      : null;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -66,6 +91,14 @@ const AdminDestinationDetail: React.FC = () => {
             <CalendarIcon className="h-5 w-5 mr-1" />
             <span>{new Date(destination.createdDate).toLocaleDateString("vi-VN")}</span>
           </div>
+          {destination.status?.toLowerCase() === "approved" && (
+            <div className="flex items-center">
+              <StarIcon className="h-5 w-5 text-yellow-500 mr-1" />
+              <span>
+                {averageRating ? `${averageRating}/5 (${reviews.length} đánh giá)` : "Chưa có đánh giá"}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Ảnh chính */}
@@ -94,6 +127,53 @@ const AdminDestinationDetail: React.FC = () => {
                 />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Reviews Section - chỉ hiển thị nếu đã duyệt */}
+        {destination.status?.toLowerCase() === "approved" && (
+          <div className="bg-white rounded-xl shadow-md p-8 mt-10">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Đánh giá ({reviews.length})
+            </h2>
+            {reviews.length > 0 ? (
+              <div className="space-y-6">
+                {reviews
+                  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                  .map((review) => (
+                    <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-blue-100 p-2 rounded-full">
+                          <UserIcon className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-semibold text-gray-900">{review.username}</h4>
+                            <span className="text-sm text-gray-500">
+                              {new Date(review.createdAt).toLocaleDateString("vi-VN")}
+                            </span>
+                          </div>
+                          <div className="flex items-center mb-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <StarSolidIcon
+                                key={star}
+                                className={`h-4 w-4 ${star <= review.rating ? "text-yellow-500" : "text-gray-300"}`}
+                              />
+                            ))}
+                            <span className="ml-2 text-sm text-gray-600">{review.rating}/5</span>
+                          </div>
+                          <p className="text-gray-700">{review.comment}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <StarIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">Chưa có đánh giá nào cho địa điểm này</p>
+              </div>
+            )}
           </div>
         )}
       </div>
